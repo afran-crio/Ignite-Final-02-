@@ -1,0 +1,184 @@
+/* ==========================================================================
+   STATS (BoldStats) — "Experience Demonstrated Through Scale"
+
+   Label and headline on the shared section pattern, then a bento: $2B on a
+   dark panel — the hero's ink — set large in the accent, with an accent
+   glow rising slowly through it, foot to head, as the About figure's bars
+   do; beside it the supporting figures as tiles on the soft grey, two by
+   two, their suffixes in the accent. On mobile the panel leads and the
+   tiles follow, still two by two.
+   ========================================================================== */
+
+.stats-bold { color: var(--c-ink); }
+
+.stats-bold__eyebrow { margin-bottom: var(--eyebrow-space); }
+
+.stats-bold__heading { color: var(--c-ink); }
+
+.stats-bold__body {
+  display: grid;
+  gap: var(--gutter);
+  margin-top: var(--title-space);
+}
+
+/* The suffix of every figure ("+", "B") in the accent. */
+.stats-bold .countup__affix { color: var(--c-orange); }
+
+/* ------------------------------------------------------------ the panel */
+.stats-bold__lead {
+  container-type: inline-size;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: calc(var(--spacing) * 40);
+  min-height: calc(var(--spacing) * 300);
+  padding: var(--card-pad);
+  border-radius: var(--radius-media);
+  background: var(--c-dark);
+  color: var(--c-on-dark);
+}
+
+/* The rising glow: a broad band of the accent travelling up through the
+   panel and out of the top, then a rest. The pseudo's background moves;
+   the panel clips it. */
+.stats-bold__lead::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(
+    70% 50% at 30% 50%,
+    rgba(240, 89, 40, 0.34),
+    transparent 70%
+  ) no-repeat;
+  background-size: 100% 90%;
+  background-position: 0 260%;
+  pointer-events: none;
+}
+
+.stats-bold__lead.is-visible::before {
+  animation: stats-rise 7s var(--ease) infinite;
+  animation-delay: 900ms;
+}
+
+@keyframes stats-rise {
+  0% { background-position: 0 260%; }
+  60% { background-position: 0 -160%; }
+  100% { background-position: 0 -160%; }
+}
+
+/* The one figure allowed to outsize the hero headline: it is set inside a
+   panel, where it reads as an object rather than competing as a line of
+   type, and the panel needs it to fill its space. The size is taken from
+   the panel's own width and capped at 220px.
+
+   On arrival it climbs through the millions at a little over half size,
+   through the tenths of a billion at three quarters, and lands on $2B at
+   full size — growing twice as it climbs. The in-between steps ("$950M",
+   "$1.4B") are wider than "$2B", and the scales keep every step inside the
+   panel. The scale is from the baseline's left end, so the figure grows up
+   and out from where it sits. */
+.stats-bold__value {
+  font-size: min(calc(var(--spacing) * 220), 44cqi);
+  font-weight: var(--fw-medium);
+  line-height: 0.82;
+  letter-spacing: var(--ls-display);
+  color: var(--c-orange);
+  white-space: nowrap;
+}
+
+.stats-bold__lead .countup__affix { color: inherit; }
+
+.stats-bold__value .countup__live {
+  transform-origin: left bottom;
+  transition: transform 700ms var(--ease-out);
+}
+
+.stats-bold__value .countup[data-unit='M'] .countup__live { transform: scale(0.55); }
+.stats-bold__value .countup[data-unit='B'] .countup__live { transform: scale(0.72); }
+
+.stats-bold__label {
+  font-size: var(--fs-h3);
+  font-weight: var(--fw-medium);
+  line-height: var(--lh-subhead);
+  letter-spacing: var(--ls-heading);
+  color: var(--c-on-dark);
+}
+
+.stats-bold__support {
+  max-width: 24em;
+  margin-top: calc(var(--spacing) * 8);
+  font-size: var(--fs-lead);
+  line-height: 1.5;
+  color: var(--c-on-dark-soft);
+}
+
+/* ------------------------------------------------------------- the tiles */
+.stats-bold__tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--gutter);
+}
+
+.stats-bold__tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: calc(var(--spacing) * 20);
+  min-height: calc(var(--spacing) * 150);
+  padding: calc(var(--card-pad) * 0.75);
+  border-radius: var(--radius-media);
+  background: var(--c-beige-deep);
+}
+
+.stats-bold__item-value {
+  font-size: calc(var(--spacing) * 44);
+  font-weight: var(--fw-medium);
+  line-height: 0.9;
+  letter-spacing: var(--ls-display);
+  color: var(--c-ink);
+}
+
+.stats-bold__item-label {
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
+  color: var(--c-ink-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stats-bold__lead.is-visible::before {
+    animation: none;
+    background-position: 0 90%;
+  }
+}
+
+/* Desktop: the panel in the first six columns, the tiles in the last six;
+   the panel's height is two tiles and the gutter between them. */
+@media (min-width: 1024px) {
+  .stats-bold__body {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--gutter);
+  }
+
+  .stats-bold__lead {
+    grid-column: 1 / span 6;
+    min-height: 0;
+  }
+
+
+  .stats-bold__tiles {
+    grid-column: 7 / span 6;
+    grid-auto-rows: 1fr;
+  }
+
+  .stats-bold__tile {
+    min-height: calc(var(--spacing) * 210);
+    padding: var(--card-pad);
+  }
+
+  .stats-bold__item-value { font-size: calc(var(--spacing) * 80); }
+  .stats-bold__item-label { font-size: var(--fs-body); }
+}

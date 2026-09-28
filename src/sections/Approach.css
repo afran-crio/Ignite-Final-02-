@@ -1,0 +1,174 @@
+/* ==========================================================================
+   THE IGNITE APPROACH — the four principles as a timeline
+
+   Each step is a column: the step number, a hairline beneath it carrying a
+   marker, and the title beneath, flush with the number. The leading step
+   (Approach.tsx moves the lead through the four in turn) has its outlined
+   number fill with the accent from the foot up, its title firmed up, and an
+   orange line filling along its hairline as the timer.
+
+   Two by two on phones, four across from tablet up.
+   ========================================================================== */
+
+.approach {
+  --wash-x: 24%;
+  --wash-w: 60%;
+  --wash-h: 34%;
+  --wash-a: 0.08;
+}
+
+.approach__eyebrow { margin-bottom: var(--eyebrow-space); }
+
+.approach__lead {
+  color: var(--c-ink);
+  text-wrap: balance;
+}
+
+.approach__track {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: calc(var(--spacing) * 28) var(--gutter);
+  margin-top: var(--title-space);
+}
+
+.approach__card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.approach__card:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: calc(var(--spacing) * 8);
+  border-radius: calc(var(--spacing) * 4);
+}
+
+/* ----------------------------------------------------------- step number
+   Every number at one size, a pale ghost of the ink at rest. The leading
+   step's number fills with the accent from the foot up — the site's rising
+   motion — and drains again as the lead moves on. The fill is a two-tone
+   background, ghost above and orange below, twice the figure's height and
+   clipped to the glyphs; sliding it up brings the orange up through them.
+   (An outline was tried: the variable font's overlapping contours showed as
+   stray lines inside the 1 and the 4.) */
+.approach__number {
+  align-self: flex-start;
+  padding-bottom: calc(var(--spacing) * 14);
+  font-size: calc(var(--spacing) * 64);
+  font-weight: var(--fw-medium);
+  line-height: 0.8;
+  letter-spacing: var(--ls-display);
+  font-variant-numeric: tabular-nums;
+  color: transparent;
+  background-image: linear-gradient(to top, var(--c-orange) 50%, rgba(20, 20, 20, 0.1) 50%);
+  background-size: 100% 200%;
+  background-position: 0 0;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  pointer-events: none;
+  transition: background-position 900ms var(--ease-out);
+}
+
+.approach__card.is-active .approach__number { background-position: 0 100%; }
+
+/* ------------------------------------------------ hairline, marker, timer */
+.approach__rule {
+  position: relative;
+  display: block;
+  height: 1px;
+  background: var(--c-line);
+}
+
+.approach__dot {
+  position: absolute;
+  top: calc(var(--spacing) * -4);
+  left: 0;
+  width: calc(var(--spacing) * 9);
+  height: calc(var(--spacing) * 9);
+  border-radius: var(--radius-pill);
+  background: var(--c-mute);
+  transition:
+    background 400ms var(--ease-out),
+    transform 400ms var(--ease-out);
+}
+
+.approach__card.is-active .approach__dot {
+  background: var(--c-orange);
+  transform: scale(1.35);
+}
+
+/* The timer: an orange line drawn along the leading step's hairline over
+   the interval. Held under the pointer, it stands full. */
+.approach__fill {
+  position: absolute;
+  inset: calc(var(--spacing) * -0.5) 0 auto 0;
+  height: calc(var(--spacing) * 2);
+  background: var(--c-orange);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.approach__card.is-active .approach__fill {
+  animation: approach-fill var(--interval, 3200ms) linear both;
+}
+
+.approach__track.is-held .approach__card.is-active .approach__fill {
+  animation: none;
+  transform: none;
+}
+
+@keyframes approach-fill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* ------------------------------------------------------------------ title */
+.approach__title {
+  padding-top: calc(var(--spacing) * 16);
+  font-size: var(--fs-h3);
+  font-weight: var(--fw-medium);
+  line-height: var(--lh-subhead);
+  letter-spacing: var(--ls-heading);
+  color: var(--c-ink-soft);
+  transition: color 400ms var(--ease-out);
+}
+
+.approach__card.is-active .approach__title { color: var(--c-ink); }
+
+@media (min-width: 768px) {
+  .approach__track { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1024px) {
+  /* The client asked the headline to turn after "relationships": each line
+     is held whole. The size is the shared section-headline scale, which is
+     defined from the longer of these lines (see tokens.css), so it runs a
+     little past the ten-column headline measure by design. */
+  .approach__lead { max-width: none; }
+
+  .approach__lead-line {
+    display: block;
+    white-space: nowrap;
+  }
+
+  .approach__number {
+    padding-bottom: calc(var(--spacing) * 20);
+    font-size: calc(var(--spacing) * 120);
+  }
+
+  .approach__title { padding-top: calc(var(--spacing) * 20); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .approach__number,
+  .approach__dot,
+  .approach__title { transition-duration: 1ms; }
+
+  .approach__card.is-active .approach__fill {
+    animation: none;
+    transform: none;
+  }
+}

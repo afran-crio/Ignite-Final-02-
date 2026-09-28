@@ -1,0 +1,739 @@
+/* ==========================================================================
+   TEAM — leadership first
+
+   The two leaders (the members with an approved designation) as feature
+   cards: portrait beside their credentials, in full. The rest of the team
+   in one row of portraits beneath, names under them; each opens the
+   member's profile in a panel. Every portrait shares one frame (4:5, the
+   face held a little below the top), so the faces sit at an even size and
+   height across the section — and one treatment: black and white at rest,
+   coming into colour under the pointer, so photographs taken in different
+   light read as one set.
+   ========================================================================== */
+
+/* The team and the founder's perspective beneath share one warm-grey panel,
+   one step down from the page, as the site's alternating sections do. */
+.team {
+  background: var(--c-beige-deep);
+  /* The cards have no frame at rest — portraits and text sit on the grey
+     like a gallery wall. Under the pointer a faint edge and a breath of
+     light ground come up around the card. */
+  --team-line: rgba(20, 20, 20, 0);
+  --team-line-hover: rgba(20, 20, 20, 0.12);
+  --team-ground-hover: rgba(255, 255, 255, 0.35);
+  /* The quiet ease every hover change shares: an even start, a long
+     settle. */
+  --team-ease: cubic-bezier(0.45, 0, 0.25, 1);
+}
+
+.team__eyebrow { margin-bottom: var(--eyebrow-space); }
+
+/* The shared headline measure, balanced into even lines. */
+.team__lead {
+  margin-inline: 0;
+  text-wrap: balance;
+}
+
+/* ---------------------------------------------------------------- portrait
+   One frame for every portrait. The photographs are square with the face
+   high in the frame; a 4:5 crop held 12% from the top keeps the head clear
+   of the edge and the shoulders in. The warm ground shows while it loads. */
+.team__photo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  object-position: 50% 12%;
+  border-radius: var(--radius-card);
+  background: #ece8e4;
+  filter: grayscale(1) contrast(1.05);
+  transition:
+    filter 600ms var(--ease-out),
+    transform 1600ms var(--team-ease);
+}
+
+/* The profile panel shows the member in colour. */
+.team__panel .team__photo { filter: none; }
+
+/* The colour, on every card: a second, colour copy of the portrait over
+   the black and white, which fades in — slowly and evenly, no sweep — under
+   the pointer (or keyboard focus), and for the first leader's two-second
+   intro (Team.tsx); and fades away as it leaves. */
+.team__wash {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+}
+
+/* Sized by its photograph, not stretched to the card's height, so both
+   copies share one frame exactly. */
+.team__leader-photo { align-self: start; }
+
+.team__photo--colour {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  filter: none;
+  opacity: 0;
+  transition:
+    opacity 1400ms var(--team-ease),
+    transform 1600ms var(--team-ease);
+}
+
+.team__leaders.is-intro .team__leader:first-child .team__photo--colour,
+.team__member-button:focus-visible .team__photo--colour { opacity: 1; }
+
+@media (hover: hover) {
+  .team__leader:hover .team__photo--colour,
+  .team__member-button:hover .team__photo--colour { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .team__photo--colour { transition-duration: 300ms; }
+}
+
+/* The name's underline: a thin orange line drawn in beneath it, from the
+   left, as the card is approached (the leaders' names and the team's). */
+.team__leader .team__name,
+.team__member-name {
+  width: fit-content;
+  padding-bottom: calc(var(--spacing) * 4);
+  background: linear-gradient(var(--c-orange), var(--c-orange)) no-repeat left bottom / 0% 1px;
+  background-origin: content-box;
+  transition: background-size 700ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+@media (hover: hover) {
+  .team__leader:hover .team__name,
+  .team__member-button:hover .team__member-name { background-size: 100% 1px; }
+}
+
+.team__member-button:focus-visible .team__member-name { background-size: 100% 1px; }
+
+/* ----------------------------------------------------------------- leaders */
+.team__leaders {
+  display: grid;
+  gap: var(--gutter);
+  margin-top: var(--title-space);
+  text-align: left;
+}
+
+.team__leader {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  gap: calc(var(--spacing) * 16);
+  padding: calc(var(--spacing) * 10);
+  border-radius: calc(var(--radius-card) + var(--spacing) * 8);
+  /* A hairline frame rather than a filled card. */
+  box-shadow: inset 0 0 0 1px var(--team-line);
+  transition:
+    box-shadow 900ms var(--team-ease),
+    background-color 900ms var(--team-ease);
+}
+
+@media (hover: hover) {
+  .team__leader:hover { background-color: var(--team-ground-hover); }
+}
+
+.team__leader .team__credentials { font-size: var(--fs-body); }
+
+/* The entrance (desktop, where portrait and profile sit side by side in
+   equal columns): each portrait starts over the profile — one column and
+   the gap to the right — and sweeps right to left into place, uncovering
+   the profile behind it. The second card follows the first.
+   Set back only while armed (Team.tsx). */
+@media (min-width: 1024px) {
+  .team__leaders.is-armed .team__leader-photo {
+    position: relative;
+    z-index: 2;
+    transform: translateX(calc(100% + var(--spacing) * 28));
+    box-shadow: -24px 0 40px -20px rgba(20, 20, 20, 0.35);
+    transition:
+      transform 1200ms cubic-bezier(0.7, 0, 0.2, 1),
+      box-shadow 1200ms cubic-bezier(0.7, 0, 0.2, 1);
+  }
+
+  /* The profile is uncovered from its right edge leftwards, in step with
+     the portrait passing over it — same length, same curve — so it appears
+     exactly as the portrait leaves it. */
+  .team__leaders.is-armed .team__leader-body {
+    clip-path: inset(-20px -20px -20px 100%);
+    transition: clip-path 1200ms cubic-bezier(0.7, 0, 0.2, 1);
+  }
+
+  .team__leaders.is-armed.is-swiped .team__leader-photo {
+    transform: none;
+    box-shadow: 0 0 0 0 rgba(20, 20, 20, 0);
+  }
+
+  /* The reveal's edge ends one gap short of the text, where the portrait's
+     edge comes to rest, so the two travel together the whole way. */
+  .team__leaders.is-armed.is-swiped .team__leader-body {
+    clip-path: inset(-20px -20px -20px calc(var(--spacing) * -28));
+  }
+
+  .team__leaders.is-armed .team__leader:nth-child(2) .team__leader-photo { transition-delay: 220ms; }
+  .team__leaders.is-armed .team__leader:nth-child(2) .team__leader-body { transition-delay: 220ms; }
+}
+
+
+
+.team__leader-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: calc(var(--spacing) * 6) calc(var(--spacing) * 4) calc(var(--spacing) * 6) 0;
+}
+
+/* Phones: the portrait and the name side by side, the credentials across
+   the card beneath them. */
+@media (max-width: 767px) {
+  .team__leader {
+    grid-template-columns: calc(var(--spacing) * 116) minmax(0, 1fr);
+    column-gap: calc(var(--spacing) * 14);
+  }
+
+  .team__leader-body { display: contents; }
+
+  .team__leader .team__name,
+  .team__leader .team__title { grid-column: 2; align-self: end; }
+  .team__leader .team__name { grid-row: 1; align-self: center; margin-top: calc(var(--spacing) * -24); }
+  .team__leader .team__title { grid-row: 1; align-self: center; margin-top: calc(var(--spacing) * 36); }
+
+  .team__leader .team__rule,
+  .team__leader .team__credentials,
+  .team__leader .team__linkedin { grid-column: 1 / -1; margin-inline: calc(var(--spacing) * 6); }
+
+  .team__leader .team__rule { margin-block: calc(var(--spacing) * 8) 0; }
+  .team__leader .team__linkedin { margin-bottom: calc(var(--spacing) * 8); }
+}
+
+/* -------------------------------------------------------------------- team */
+.team__grid {
+  display: grid;
+  /* Two across on phones, so the one-line introductions have room. */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: calc(var(--spacing) * 28) calc(var(--spacing) * 14);
+  margin-top: calc(var(--spacing) * 48);
+  text-align: left;
+}
+
+/* Each member a card in the same frame as the leaders': the portrait
+   inset in a defined outline, the name and introduction beneath. */
+.team__member-button {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: calc(var(--spacing) * 8) calc(var(--spacing) * 8) calc(var(--spacing) * 14);
+  border-radius: calc(var(--radius-card) + var(--spacing) * 6);
+  box-shadow: inset 0 0 0 1px var(--team-line);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    box-shadow 900ms var(--team-ease),
+    background-color 900ms var(--team-ease);
+}
+
+.team__member-name,
+.team__member-line { padding-inline: calc(var(--spacing) * 4); }
+
+.team__member-photo {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  /* Its own layer, so the zoom stays inside the rounded corners. */
+  isolation: isolate;
+}
+
+/* The cue: a soft shade rises from the foot of the portrait with the
+   invitation on it. */
+/* The cue, in the reverse's style: a small dark label set in the
+   portrait's lower corner. */
+.team__member-cue {
+  position: absolute;
+  left: calc(var(--spacing) * 14);
+  bottom: calc(var(--spacing) * 14);
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 8);
+  padding: calc(var(--spacing) * 8) calc(var(--spacing) * 14);
+  border-radius: var(--radius-pill);
+  background: rgba(22, 21, 20, 0.88);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  font-size: var(--fs-mono);
+  font-weight: var(--fw-medium);
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(calc(var(--spacing) * 8));
+  transition: opacity 900ms var(--team-ease), transform 900ms var(--team-ease);
+}
+
+/* Under the pointer, an outline in the accent's gradient — orange to
+   amber, easing to a trace of orange at the foot — comes up around the
+   card. A layer of its own, masked to a ring, so it can fade. */
+.team__member-button,
+.team__leader {
+  position: relative;
+  isolation: isolate;
+}
+
+.team__member-button::before,
+.team__leader::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  padding: 1.5px;
+  border-radius: inherit;
+  background: linear-gradient(160deg, #f05928 0%, #fe9826 45%, rgba(240, 89, 40, 0.25) 100%);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 700ms var(--team-ease);
+}
+
+.team__member-name {
+  display: block;
+  margin-top: calc(var(--spacing) * 12);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+  line-height: 1.3;
+  letter-spacing: var(--ls-heading);
+  color: var(--c-ink);
+}
+
+.team__member-line {
+  display: block;
+  margin-top: calc(var(--spacing) * 4);
+  font-size: calc(var(--fs-small) * 0.95);
+  line-height: 1.45;
+  color: var(--c-mute);
+  text-wrap: pretty;
+}
+
+@media (hover: hover) {
+  .team__member-button:hover::before,
+  .team__leader:hover::before { opacity: 1; }
+  .team__member-button:hover .team__photo { transform: scale(1.025); }
+  .team__member-button:hover .team__member-cue { opacity: 1; transform: none; }
+}
+
+.team__member-button:focus-visible { outline: none; }
+
+.team__member-button:focus-visible .team__member-photo {
+  outline: 2px solid var(--c-focus);
+  outline-offset: calc(var(--spacing) * 3);
+}
+
+.team__member-button:focus-visible .team__member-cue { opacity: 1; transform: none; }
+
+.team__member-button:focus-visible::before { opacity: 1; }
+
+.team__member-name,
+.team__member-line { transition: color 700ms var(--team-ease), background-size 700ms cubic-bezier(0.65, 0, 0.35, 1); }
+
+/* --------------------------------------------------------------- the card
+   text, shared by the leaders' cards and the panel. */
+.team__name {
+  font-size: var(--fs-h3);
+  font-weight: var(--fw-medium);
+  line-height: var(--lh-subhead);
+  letter-spacing: var(--ls-heading);
+  color: var(--c-ink);
+}
+
+.team__title { margin-top: calc(var(--spacing) * 8); }
+
+/* A short accent rule rather than a line across the card. */
+.team__rule {
+  width: calc(var(--spacing) * 28);
+  height: 1px;
+  margin: calc(var(--spacing) * 18) 0;
+  background: var(--c-orange);
+}
+
+.team__credentials {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--spacing) * 10);
+  font-size: var(--fs-small);
+  line-height: 1.5;
+  color: var(--c-ink-soft);
+  text-wrap: pretty;
+}
+
+/* No list markers: the points stand as short lines of copy, spaced apart. */
+.team__credentials li { padding-left: 0; }
+
+.team__linkedin {
+  margin-top: calc(var(--spacing) * 20);
+  align-self: flex-start;
+  justify-self: start;
+  padding: calc(var(--spacing) * 7) calc(var(--spacing) * 14);
+  border-radius: var(--radius-pill);
+  box-shadow: inset 0 0 0 1px var(--c-line);
+  color: var(--c-ink-soft);
+  text-decoration: none;
+  transition:
+    color var(--transition-fast) var(--ease),
+    box-shadow var(--transition-fast) var(--ease);
+}
+
+.team__linkedin:hover { box-shadow: inset 0 0 0 1px var(--c-orange); }
+
+.team__linkedin:hover,
+.team__linkedin:focus-visible { color: var(--c-orange); }
+
+.team__linkedin:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: calc(var(--spacing) * 4);
+  border-radius: calc(var(--spacing) * 2);
+}
+
+/* ------------------------------------------------------------------- flip
+   The team's cards turn over (on "View profile") to show the profile on
+   their reverse, in the same frame. Both faces share one grid cell, so the
+   card keeps the front's size. A soft spring, with a little overshoot as it
+   settles. Phones open the profile in the panel instead (Team.tsx). */
+.team__member { perspective: calc(var(--spacing) * 2000); }
+
+.team__flip {
+  display: grid;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 850ms cubic-bezier(0.34, 1.25, 0.64, 1);
+}
+
+.team__flip.is-flipped { transform: rotateY(180deg); }
+
+.team__face {
+  grid-area: 1 / 1;
+  min-width: 0;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.team__face--back {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: calc(var(--spacing) * 36) calc(var(--spacing) * 32);
+  border-radius: calc(var(--radius-card) + var(--spacing) * 6);
+  /* The reverse in the dark of the hero and the footer, warmed by a glow
+     of the accent from its top corner. */
+  background:
+    radial-gradient(120% 70% at 100% 0%, rgba(240, 89, 40, 0.28), transparent 55%),
+    #161514;
+  color: #fff;
+  box-shadow: 0 30px 60px -30px rgba(20, 20, 20, 0.6);
+  transform: rotateY(180deg);
+  text-align: left;
+  --back-line: rgba(255, 255, 255, 0.12);
+}
+
+.team__back-photo {
+  width: calc(var(--spacing) * 56);
+  height: calc(var(--spacing) * 56);
+  margin-bottom: calc(var(--spacing) * 18);
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: 50% 15%;
+  background: #ece8e4;
+  box-shadow: 0 0 0 2px rgba(240, 89, 40, 0.8);
+}
+
+.team__face--back .team__name {
+  margin-bottom: calc(var(--spacing) * 22);
+  font-size: calc(var(--spacing) * 30);
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+
+/* The credentials numbered in the accent, between fine rules. */
+.team__face--back .team__credentials {
+  counter-reset: credential;
+  gap: 0;
+  width: 100%;
+  font-size: var(--fs-body);
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.team__face--back .team__credentials li {
+  counter-increment: credential;
+  display: grid;
+  grid-template-columns: calc(var(--spacing) * 34) minmax(0, 1fr);
+  padding: calc(var(--spacing) * 14) 0;
+  border-top: 1px solid var(--back-line);
+}
+
+.team__face--back .team__credentials li:last-child { border-bottom: 1px solid var(--back-line); }
+
+.team__face--back .team__credentials li::before {
+  content: counter(credential, decimal-leading-zero);
+  padding-top: 0.35em;
+  font-size: var(--fs-mono);
+  font-weight: var(--fw-medium);
+  letter-spacing: var(--ls-mono);
+  color: var(--c-orange);
+}
+
+/* LinkedIn as an underlined link at the foot. */
+.team__face--back .team__linkedin {
+  margin-top: auto;
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
+  color: #fff;
+  text-decoration: underline;
+  text-decoration-color: var(--c-orange);
+  text-underline-offset: calc(var(--spacing) * 6);
+}
+
+.team__face--back .team__linkedin:hover { box-shadow: none; color: var(--c-orange); }
+
+.team__back-close {
+  position: absolute;
+  top: calc(var(--spacing) * 18);
+  right: calc(var(--spacing) * 18);
+  display: grid;
+  place-items: center;
+  width: calc(var(--spacing) * 36);
+  height: calc(var(--spacing) * 36);
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: calc(var(--spacing) * 18);
+  line-height: 1;
+  transition: color var(--transition-fast) var(--ease), box-shadow var(--transition-fast) var(--ease);
+}
+
+.team__back-close:hover {
+  color: var(--c-orange);
+  box-shadow: inset 0 0 0 1px var(--c-orange);
+}
+
+.team__back-close:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: calc(var(--spacing) * 3);
+}
+
+/* ------------------------------------------------ the front's rule between
+   the name and the introduction. */
+.team__member-line {
+  position: relative;
+  margin-top: calc(var(--spacing) * 10);
+  padding-top: calc(var(--spacing) * 10);
+}
+
+.team__member-line::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: calc(var(--spacing) * 4);
+  width: calc(var(--spacing) * 22);
+  height: 1px;
+  background: var(--c-orange);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .team__flip { transition-duration: 1ms; }
+}
+
+/* ------------------------------------------------------------------ panel
+   The member's profile: from the right on larger screens, from the foot of
+   the screen on phones, over a dimmed page. */
+.team__panel {
+  position: fixed;
+  inset: 0;
+  /* Above the nav. */
+  z-index: 1000;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.team__panel-backdrop {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  border: 0;
+  background: rgba(20, 20, 20, 0.4);
+  animation: team-fade 320ms var(--ease-out) both;
+}
+
+.team__panel-sheet {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(calc(var(--spacing) * 520), 100vw);
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: calc(var(--spacing) * 40) calc(var(--spacing) * 40) calc(var(--spacing) * 28);
+  background: var(--c-paper);
+  color: var(--c-ink);
+  box-shadow: -30px 0 80px rgba(0, 0, 0, 0.18);
+  animation: team-slide-in 460ms var(--ease-out) both;
+}
+
+.team__panel.is-closing .team__panel-backdrop { animation: team-fade-out 320ms var(--ease-out) both; }
+.team__panel.is-closing .team__panel-sheet { animation: team-slide-out 320ms var(--ease-out) both; }
+
+.team__panel-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1;
+  animation: team-content-in 420ms var(--ease-out) both;
+}
+
+.team__panel-photo {
+  aspect-ratio: 5 / 4;
+  object-position: 50% 15%;
+  margin-bottom: calc(var(--spacing) * 24);
+}
+
+.team__panel-name { font-size: calc(var(--fs-h3) * 1.3); }
+
+.team__panel .team__credentials {
+  font-size: var(--fs-body);
+  gap: calc(var(--spacing) * 12);
+}
+
+.team__panel-close {
+  display: grid;
+  place-items: center;
+  width: calc(var(--spacing) * 40);
+  height: calc(var(--spacing) * 40);
+  border-radius: 50%;
+  background: var(--c-paper);
+  box-shadow: inset 0 0 0 1px var(--c-line);
+  color: var(--c-ink);
+  font-size: calc(var(--spacing) * 18);
+  line-height: 1;
+  transition:
+    color var(--transition-fast) var(--ease),
+    box-shadow var(--transition-fast) var(--ease);
+}
+
+.team__panel-close {
+  position: absolute;
+  top: calc(var(--spacing) * 20);
+  right: calc(var(--spacing) * 20);
+  z-index: 1;
+}
+
+.team__panel-close:hover {
+  color: var(--c-orange);
+  box-shadow: inset 0 0 0 1px var(--c-orange);
+}
+
+.team__panel-close:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: calc(var(--spacing) * 3);
+}
+
+@keyframes team-fade { from { opacity: 0; } }
+@keyframes team-fade-out { to { opacity: 0; } }
+@keyframes team-slide-in { from { transform: translateX(100%); } }
+@keyframes team-slide-out { to { transform: translateX(100%); } }
+@keyframes team-rise-in { from { transform: translateY(100%); } }
+@keyframes team-rise-out { to { transform: translateY(100%); } }
+@keyframes team-content-in {
+  from { opacity: 0; transform: translateY(calc(var(--spacing) * 10)); }
+}
+
+/* Phones: a sheet from the foot of the screen, most of its height. */
+@media (max-width: 767px) {
+  .team__panel { align-items: flex-end; }
+
+  .team__panel-sheet {
+    width: 100vw;
+    height: auto;
+    max-height: 90vh;
+    max-height: 90svh;
+    padding: calc(var(--spacing) * 24) var(--margin) calc(var(--spacing) * 24);
+    border-radius: calc(var(--spacing) * 22) calc(var(--spacing) * 22) 0 0;
+    box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.18);
+    animation-name: team-rise-in;
+  }
+
+  .team__panel.is-closing .team__panel-sheet { animation-name: team-rise-out; }
+
+  .team__panel-close { top: calc(var(--spacing) * 14); right: calc(var(--spacing) * 14); }
+
+  .team__panel-photo { aspect-ratio: 4 / 3; }
+}
+
+/* ----------------------------------------------------------------- layout */
+@media (min-width: 768px) {
+  .team__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: calc(var(--spacing) * 32) var(--gutter);
+  }
+}
+
+@media (min-width: 1024px) {
+  .team__leaders { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  /* The portrait takes half the card, so the leaders' portraits stand as
+     large as the team's below them. */
+  .team__leader {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: calc(var(--spacing) * 28);
+    padding: calc(var(--spacing) * 14);
+  }
+
+  .team__leader-body { padding: calc(var(--spacing) * 18) calc(var(--spacing) * 18) calc(var(--spacing) * 18) 0; }
+
+  .team__leader .team__name { font-size: calc(var(--spacing) * 30); }
+
+
+  /* Three across, in two rows: portraits large enough to meet. */
+  .team__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--gutter);
+    margin-top: var(--gutter);
+  }
+
+  .team__member-button { padding: calc(var(--spacing) * 14) calc(var(--spacing) * 14) calc(var(--spacing) * 22); }
+
+  .team__member-name,
+  .team__member-line { padding-inline: calc(var(--spacing) * 6); }
+
+  .team__member-name {
+    margin-top: calc(var(--spacing) * 18);
+    font-size: calc(var(--spacing) * 23);
+    letter-spacing: -0.015em;
+  }
+
+  .team__member-line::before { left: calc(var(--spacing) * 6); }
+
+  .team__member-line { font-size: var(--fs-small); }
+
+  /* Square here — the photographs' own shape — so the larger cards stay
+     below the leaders' portraits in height. */
+  .team__member-photo .team__photo {
+    aspect-ratio: 1 / 1;
+    object-position: 50% 18%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .team__panel-backdrop,
+  .team__panel-sheet,
+  .team__panel-content { animation: none !important; }
+  .team__photo,
+  .team__member-cue { transition: none; }
+}

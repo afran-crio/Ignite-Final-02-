@@ -1,0 +1,32 @@
+/* The sweep: 1.6s across the text, then 2.4s at rest before the next one
+   (so the sweep takes the first 40% of each 4s cycle); the first begins
+   1.2s after load. Before it, and at rest, the highlight waits past the
+   text's right edge (250%), so the text shows its plain colour. */
+.shimmer {
+  -webkit-text-fill-color: transparent;
+  background: currentColor
+    linear-gradient(
+      to right,
+      currentColor 0%,
+      var(--shimmer-contrast) 40%,
+      var(--shimmer-contrast) 60%,
+      currentColor 100%
+    );
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-repeat: no-repeat;
+  background-size: 50% 200%;
+  background-position-x: 250%;
+  animation: shimmer-sweep 4s linear 1.2s infinite;
+}
+
+@keyframes shimmer-sweep {
+  0% { background-position-x: -100%; }
+  40%,
+  100% { background-position-x: 250%; }
+}
+
+/* Reduced motion keeps the colour and drops the sweep. */
+@media (prefers-reduced-motion: reduce) {
+  .shimmer { animation: none; }
+}

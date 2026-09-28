@@ -1,0 +1,263 @@
+/* ==========================================================================
+   IGNITE — DESIGN TOKENS
+   Visual system modelled on the Daylight reference: a cream ground, a fluid
+   12-column grid, and a root font-size that scales with the viewport so the
+   entire layout grows and shrinks continuously rather than snapping at
+   breakpoints.
+
+   THE CORE MECHANIC
+   `--spacing` is .0625rem — 1px when the root is 16px. Every spacing value is
+   expressed as a multiple of it, so when the root font-size grows with the
+   viewport, all spacing grows with it. Change the root formula and the whole
+   page rescales.
+   ========================================================================== */
+
+:root {
+  /* The unit everything else is built from: .0625rem is 1px at a 16px root.
+     Because the root font-size is fluid (see the `html` rule below), every
+     value expressed as a multiple of this scales with the viewport. */
+  --spacing: 0.0625rem;
+
+  /* ---------------------------------------------------------------- colour */
+  /* Approved Ignite brand palette */
+  --c-orange: #f05928;      /* the one accent — everything highlighted is this */
+  --c-amber: #ffb825;       /* approved, held in reserve; nothing paints it */
+  --c-graphite: #4a4a4a;
+
+  /* Surfaces — a white ground. The names are kept so the whole system keeps
+     pointing at one pair of surface tokens; only the values changed when the
+     cream was retired. `--c-beige-deep` is the alternating band: a neutral
+     step down, with no warm cast. Set it to #ffffff for a wholly flat page. */
+  --c-beige: #ffffff;
+  --c-beige-deep: #f4f4f3;   /* alternating band, one step down */
+  --c-orange-tint: #fdeee7;  /* the accent as a pale ground: the closing panel */
+  --c-paper: #ffffff;
+
+  /* Ink — neutral, to match the white ground. The greys were previously
+     warmed to sit on cream; on white that warmth read as taupe. */
+  --c-ink: #141414;
+  --c-ink-soft: #46464a;
+  --c-mute: #86868b;
+  --c-line: rgba(20, 20, 20, 0.13);
+  --c-line-soft: rgba(20, 20, 20, 0.07);
+
+  /* Dark environment — hero, Our Work, footer. Neutral, like the ink: the
+     warm cast belonged to the cream ground and went with it. */
+  --c-dark: #141414;
+  --c-on-dark: #ffffff;
+  --c-on-dark-soft: rgba(255, 255, 255, 0.66);
+  --c-on-dark-mute: rgba(255, 255, 255, 0.38);
+  --c-line-dark: rgba(255, 255, 255, 0.16);
+
+  --c-focus: var(--c-orange);
+  --c-selection: rgba(240, 89, 40, 0.18);
+
+  /* ------------------------------------------------------------ typography */
+  /* One family. Instrument Serif carried a single quote and DM Mono four
+     12px details — between them 144KB of webfont for five roles, and the
+     serif read as a visitor from another site. The small uppercase labels are
+     set in the sans instead, spaced out to keep their character. */
+  --font-sans: 'Figtree Variable', 'Figtree', -apple-system, BlinkMacSystemFont,
+    'Segoe UI', Helvetica, Arial, sans-serif;
+  /* Every figure on the site — the step numbers, the statistics, the
+     capability numbers, the carousel counters — is set in the one sans, as
+     the Approach numbering is. This alias exists so a figure can be told
+     apart from a label in the CSS; it resolves to the same face. (It was the
+     system monospace, which put the counters in a second typeface.) */
+  --font-numeric: var(--font-sans);
+
+  /* Type scale in `--spacing` units, so it rides the fluid root.
+     The number is the px value at a 16px root. */
+  --fs-hero: calc(var(--spacing) * 54);
+  --fs-display: calc(var(--spacing) * 40);
+  --fs-h2: calc(var(--spacing) * 34);
+  --fs-h3: calc(var(--spacing) * 21);
+  --fs-metric: calc(var(--spacing) * 64);
+  --fs-metric-sm: calc(var(--spacing) * 34);
+  --fs-lead: calc(var(--spacing) * 17);
+  --fs-body: calc(var(--spacing) * 15.5);
+  --fs-small: calc(var(--spacing) * 13.5);
+  --fs-mono: calc(var(--spacing) * 11);
+
+  --lh-display: 0.98;
+  --lh-heading: 1.06;
+  /* Subheadings — card titles, step titles, names, stat descriptors. */
+  --lh-subhead: 1.15;
+  --lh-lead: 1.36;
+  --lh-body: 1.56;
+  /* Small copy — card bodies, credentials, captions. */
+  --lh-small: 1.5;
+
+  /* Display tracking: every figure and line set at display size — the hero,
+     the $2B statistic, the closing statement, the Approach and Works
+     figures — shares this one value. */
+  --ls-display: -0.04em;
+  --ls-heading: -0.025em;
+  --ls-body: -0.005em;
+  --ls-mono: 0.085em;
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+
+  /* ---------------------------------------------------------------- layout */
+  --nav-height: calc(var(--spacing) * 76);
+
+  /* Section rhythm, in spacing units — scales with the root. Sections no
+     longer alternate grounds, so the gap between them is the only thing
+     separating one from the next: enough to breathe, not enough to read as a
+     break in the page. */
+  --section-space: calc(var(--spacing) * 72);
+  --section-space-tight: calc(var(--spacing) * 40);
+  /* Supporting copy: the line under a section headline, one level down. */
+  --fs-support: var(--fs-lead);
+  /* The lead statistic ($2B): the dominant figure, always a step under the
+     hero headline so the hero stays the largest type on the page. */
+  --fs-stat-lead: calc(var(--fs-hero) * 0.9);
+  --block-space: calc(var(--spacing) * 18);
+  /* The gap between a section's header and the content it introduces, and
+     between its eyebrow and its title. Separate from --block-space because a
+     title needs far more separation than a generic block does — at 24px the
+     headings read as captions stuck on their content. */
+  --title-space: calc(var(--spacing) * 36);
+  --eyebrow-space: calc(var(--spacing) * 14);
+  /* The gap from a headline to the supporting copy under it. */
+  --support-space: calc(var(--spacing) * 16);
+
+  /* One inner padding for every card and tile on the page. */
+  --card-pad: calc(var(--spacing) * 24);
+
+  /* THE ALIGNMENT RULE
+     Section spacing is always larger than anything inside a section: the
+     label sits close to its headline, the headline close to its content,
+     and the widest gap on the page is between one section and the next.
+     Headings, supporting copy and quotes share two measures, taken from the
+     grid, so every section's text block breaks at the same place. On
+     mobile both are the full grid; see the desktop block below. */
+  --measure-heading: 100%;
+  --measure-support: 100%;
+
+  /* -------------------------------------------------------------- elements */
+  /* The reference rounds its media generously; the system is soft, not square. */
+  --radius-media: calc(var(--spacing) * 18);
+  --radius-card: calc(var(--spacing) * 14);
+  --radius-pill: 999px;
+
+  /* ---------------------------------------------------------------- motion */
+  --transition-fast: 180ms;
+  --transition-medium: 420ms;
+  --transition-slow: 900ms;
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --reveal-distance: 24px;
+}
+
+/* ---------------------------------------------------------------------------
+   THE FLUID GRID
+   Mobile values are taken directly from the reference: at a 375px viewport
+   that is a 16px margin, a 10px gutter and twelve 19.4px columns spanning
+   343px. `--sbw` is the scrollbar width, measured in JS, so the grid tracks
+   the true content width rather than 100vw.
+   --------------------------------------------------------------------------- */
+html {
+  --sbw: 0px;
+  --screen-width: calc(100vw - var(--sbw));
+
+  --columns: 12;
+  --margin: calc(4.26667vw - var(--sbw) * 0.0426667);
+  --gutter: calc(2.66667vw - var(--sbw) * 0.0266667);
+  --column: calc(5.17778vw - var(--sbw) * 0.0517778);
+  --grid-width: calc(91.4667vw - var(--sbw) * 0.914667);
+
+  font-size: min(calc(4.26667vw - var(--sbw) * 0.0426667), 20.267px);
+}
+
+/* Tablet — 32px margin, 12px gutter at 768px. */
+@media (min-width: 768px) {
+  html {
+    --margin: calc(4.16667vw - var(--sbw) * 0.0416667);
+    --gutter: calc(1.5625vw - var(--sbw) * 0.015625);
+    --column: calc(6.53646vw - var(--sbw) * 0.0653646);
+    --grid-width: calc(91.6667vw - var(--sbw) * 0.916667);
+
+    font-size: min(calc(2.08333vw - var(--sbw) * 0.0208333), 18px);
+  }
+}
+
+/* Desktop — 44px margin, 20px gutter, ~94px columns at 1440px. The margin
+   was 64px; it was brought in so the logo, the hero headline and every
+   section share one tighter left line (40–48px across common desktop
+   widths). Columns = (grid − 11 gutters) / 12. */
+@media (min-width: 1024px) {
+  html {
+    --margin: calc(3.05556vw - var(--sbw) * 0.0305556);
+    --gutter: calc(1.38889vw - var(--sbw) * 0.0138889);
+    --column: calc(6.55093vw - var(--sbw) * 0.0655093);
+    --grid-width: calc(93.8889vw - var(--sbw) * 0.938889);
+
+    /* 16px at 1440, growing to a 19px ceiling on very wide screens. */
+    font-size: clamp(14px, calc(1.11111vw - var(--sbw) * 0.0111111), 19px);
+  }
+}
+
+/* Tablet type. The tablet root (2.08vw, capped at 18px) is smaller than a
+   large phone's (4.27vw), so tokens left on the mobile values made tablet
+   type smaller than phone type — a 39px headline at 430px fell to 34px at
+   768px, then jumped to 43px at 1024px. These carry the scale continuously
+   from the large-phone size up to where the desktop values take over. */
+@media (min-width: 768px) {
+  :root {
+    --fs-hero: min(calc(var(--spacing) * 96), calc(var(--grid-width) * 0.9 / 5.3));
+    --fs-h2: calc(27px + 1.57vw);
+  }
+}
+
+/* Desktop resets the vertical rhythm and type scale upward. */
+@media (min-width: 1024px) {
+  :root {
+    /* The hero headline: the largest type on the page, held to a share of
+       the viewport height so four lines of it always clear the nav on
+       shorter screens. */
+    /* Also held so "Empowering" (5.28em, the longest line) fills no more
+       than ~58% of the grid — the hero's right-hand column needs the rest. */
+    --fs-hero: min(calc(var(--spacing) * 136), 21svh, calc(var(--grid-width) * 0.58 / 5.3));
+    --fs-display: calc(var(--spacing) * 78);
+    /* The one section-headline size. Every major section headline (all but
+       the hero and the closing statement) takes it. It is the size at which
+       the Approach headline's longer line — 21.2em in Figtree Medium — fills
+       ~95% of the grid, capped at 58px at a 16px root, so it also holds on
+       narrower desktops where the root stops scaling but the grid does not. */
+    --fs-h2: min(calc(var(--grid-width) * 0.95 / 21.2), calc(var(--spacing) * 58));
+    --fs-h3: calc(var(--spacing) * 26);
+    --fs-metric: calc(var(--spacing) * 150);
+    --fs-metric-sm: calc(var(--spacing) * 52);
+    --fs-lead: calc(var(--spacing) * 19);
+    --fs-body: calc(var(--spacing) * 16.5);
+    --fs-small: calc(var(--spacing) * 14);
+    --fs-mono: calc(var(--spacing) * 11.5);
+
+    --nav-height: calc(var(--spacing) * 92);
+    --section-space: calc(var(--spacing) * 96);
+    --section-space-tight: calc(var(--spacing) * 56);
+    --fs-support: calc(var(--spacing) * 22);
+    --block-space: calc(var(--spacing) * 24);
+    --title-space: calc(var(--spacing) * 56);
+    --eyebrow-space: calc(var(--spacing) * 20);
+    --support-space: calc(var(--spacing) * 24);
+    --card-pad: calc(var(--spacing) * 32);
+
+    /* Headlines take ten of the twelve columns; supporting copy seven. */
+    --measure-heading: calc(var(--column) * 10 + var(--gutter) * 9);
+    --measure-support: calc(var(--column) * 7 + var(--gutter) * 6);
+    --radius-media: calc(var(--spacing) * 24);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-fast: 1ms;
+    --transition-medium: 1ms;
+    --transition-slow: 1ms;
+    --reveal-distance: 0px;
+  }
+}

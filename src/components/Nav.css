@@ -1,0 +1,363 @@
+/* At rest the nav is transparent over the full-screen hero, in light ink. On
+   scroll it collapses into a centred floating pill, as in the reference. */
+.nav {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 100;
+  height: var(--nav-height);
+  color: var(--c-on-dark);
+  display: flex;
+  align-items: center;
+  transition: color var(--transition-medium) var(--ease);
+}
+
+.nav.is-scrolled { color: var(--c-ink); }
+
+/* The white logo over the hero; the colour one once the bar has a ground
+   of its own (scrolled into the pill, or the menu open). The two are
+   stacked in one cell and cross-fade. */
+.nav__brand img {
+  grid-area: 1 / 1;
+  transition:
+    opacity var(--transition-medium) var(--ease),
+    height var(--transition-medium) var(--ease);
+}
+
+.nav__logo--colour { opacity: 0; }
+
+.nav.is-scrolled .nav__logo--light,
+.nav.is-open .nav__logo--light { opacity: 0; }
+
+.nav.is-scrolled .nav__logo--colour,
+.nav.is-open .nav__logo--colour { opacity: 1; }
+
+.nav__inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gutter);
+  width: var(--grid-width);
+  margin-inline: auto;
+  height: calc(var(--spacing) * 52);
+  padding-inline: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  box-shadow: 0 0 0 0 rgba(20, 20, 20, 0);
+  transition: width var(--transition-medium) var(--ease),
+    padding var(--transition-medium) var(--ease),
+    background var(--transition-medium) var(--ease),
+    box-shadow var(--transition-medium) var(--ease);
+}
+
+.nav__brand {
+  display: grid;
+  flex: none;
+}
+
+/* Over the hero the mark is set ~15–20% larger for presence (client
+   feedback); once the bar contracts into the pill it returns to its original
+   size, so the pill keeps its proportions. The height transitions with the
+   bar so the change reads as part of the same collapse. */
+.nav__brand img {
+  /* Heights are rounded to an even number of whole pixels, so the logo,
+     centred in the bar, lands on whole pixels and its edges stay crisp
+     (the fallback line serves browsers without round()). */
+  height: calc(var(--spacing) * 30);
+  height: round(calc(var(--spacing) * 30), 2px);
+  width: auto;
+  /* Optical centring: the mark sits above the word, so centring the image
+     leaves the word low against the links. Lifting it about a tenth of its
+     height — by whole pixels — puts the word on the links' line. */
+  translate: 0 -3px;
+  translate: 0 round(calc(var(--spacing) * -3), 1px);
+}
+
+.nav.is-scrolled .nav__brand img {
+  height: calc(var(--spacing) * 26);
+  height: round(calc(var(--spacing) * 26), 2px);
+}
+
+.nav__links {
+  display: none;
+  align-items: center;
+  gap: calc(var(--spacing) * 30);
+}
+
+.nav__link {
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+  letter-spacing: -0.01em;
+  opacity: 0.78;
+  transition: opacity var(--transition-fast) var(--ease);
+}
+
+.nav__link:hover { opacity: 1; }
+
+.nav__actions {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 14);
+  flex: none;
+}
+
+.nav__cta {
+  display: none;
+  background: var(--c-beige);
+  color: var(--c-ink);
+  padding: calc(var(--spacing) * 11) calc(var(--spacing) * 20);
+}
+
+/* On the pill: the brand orange, lit from above (a fine highlight along
+   its top edge) and set on a soft orange glow. Under the pointer a band of
+   light sweeps across it and the orange deepens a touch. */
+.nav.is-scrolled .nav__cta {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--c-orange);
+  color: #fff;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 4px 14px -6px rgba(240, 89, 40, 0.5);
+  transition:
+    background var(--transition-medium) var(--ease),
+    box-shadow var(--transition-medium) var(--ease);
+}
+
+.nav.is-scrolled .nav__cta::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.38) 48%, transparent 66%);
+  transform: translateX(-120%);
+  pointer-events: none;
+}
+
+.nav.is-scrolled .nav__cta:hover,
+.nav.is-scrolled .nav__cta:focus-visible {
+  background: #e9521f;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 8px 20px -6px rgba(240, 89, 40, 0.6);
+}
+
+/* The sweep crosses once each time the pointer arrives; leaving, it returns
+   out of sight at once, ready for the next. */
+.nav.is-scrolled .nav__cta:hover::after,
+.nav.is-scrolled .nav__cta:focus-visible::after {
+  transform: translateX(120%);
+  transition: transform 900ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav.is-scrolled .nav__cta::after { display: none; }
+}
+
+.nav__cta:hover { background: var(--c-ink); color: var(--c-beige); }
+
+/* The note beneath the button when a click has copied the address: a
+   small dark label, there for a moment. */
+.nav__actions { position: relative; }
+
+.nav__copied {
+  position: absolute;
+  top: calc(100% + var(--spacing) * 12);
+  right: 0;
+  padding: calc(var(--spacing) * 7) calc(var(--spacing) * 12);
+  border-radius: var(--radius-pill);
+  background: #161514;
+  color: #fff;
+  font-size: var(--fs-mono);
+  font-weight: var(--fw-medium);
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(calc(var(--spacing) * -4));
+  transition: opacity 250ms var(--ease-out), transform 250ms var(--ease-out);
+  pointer-events: none;
+}
+
+.nav__copied:empty { padding: 0; }
+
+.nav__copied.is-shown { opacity: 1; transform: none; }
+
+/* ------------------------------------------------------------- hamburger */
+.nav__toggle {
+  display: grid;
+  place-content: center;
+  gap: calc(var(--spacing) * 5);
+  width: calc(var(--spacing) * 44);
+  height: calc(var(--spacing) * 44);
+  margin-right: calc(var(--spacing) * -10);
+}
+
+.nav__toggle span {
+  display: block;
+  width: calc(var(--spacing) * 20);
+  height: 1.5px;
+  background: currentColor;
+  border-radius: 2px;
+  transition: transform var(--transition-medium) var(--ease-out),
+    opacity var(--transition-fast) var(--ease);
+}
+
+.nav.is-open .nav__toggle span:first-child {
+  transform: translateY(calc(var(--spacing) * 3.25)) rotate(45deg);
+}
+
+.nav.is-open .nav__toggle span:last-child {
+  transform: translateY(calc(var(--spacing) * -3.25)) rotate(-45deg);
+}
+
+/* Over a dark section further down the page: light type, and on desktop
+   the pill takes a dark see-through ground in place of the white one. The
+   logo keeps its colours — orange reads well on the dark. */
+.nav.is-scrolled.is-on-dark { color: var(--c-on-dark); }
+
+/* Below desktop there is no pill: once scrolled, the bar itself takes a
+   frosted ground, so the page never runs through the logo and the menu
+   button beneath it — light over the white sections, dark over a dark one.
+   The open menu keeps its own opaque ground. */
+@media (max-width: 1023px) {
+  .nav.is-scrolled:not(.is-open) {
+    background: rgba(255, 255, 255, 0.82);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    backdrop-filter: blur(16px) saturate(1.4);
+    box-shadow: 0 1px 0 var(--c-line-soft);
+    transition:
+      color var(--transition-medium) var(--ease),
+      background var(--transition-medium) var(--ease);
+  }
+
+  .nav.is-scrolled.is-on-dark:not(.is-open) {
+    background: rgba(20, 20, 20, 0.78);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+}
+
+/* ----------------------------------------------------------- mobile menu */
+.nav__menu[hidden] { display: none; }
+
+.nav__menu {
+  position: fixed;
+  inset: var(--nav-height) 0 0 0;
+  z-index: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--block-space);
+  padding: calc(var(--spacing) * 28) 0 calc(var(--spacing) * 40);
+  background: var(--c-beige);
+  color: var(--c-ink);
+  overflow-y: auto;
+}
+
+/* The open menu needs an opaque ground behind the bar itself. */
+.nav.is-open { background: var(--c-beige); color: var(--c-ink); }
+
+.nav__menu-links {
+  display: flex;
+  flex-direction: column;
+  width: var(--grid-width);
+  margin-inline: auto;
+}
+
+.nav__menu-link {
+  padding-block: calc(var(--spacing) * 16);
+  border-bottom: 1px solid var(--c-line-soft);
+  font-size: calc(var(--spacing) * 30);
+  font-weight: var(--fw-medium);
+  letter-spacing: var(--ls-heading);
+  opacity: 0;
+  transform: translateY(12px);
+  animation: nav-menu-in var(--transition-medium) var(--ease-out) forwards;
+  animation-delay: calc(var(--i) * 45ms + 60ms);
+}
+
+@keyframes nav-menu-in {
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav__menu-link { animation: none; opacity: 1; transform: none; }
+}
+
+.nav__menu-cta {
+  width: var(--grid-width);
+  margin-inline: auto;
+  justify-content: center;
+}
+
+@media (min-width: 1024px) {
+  .nav__links { display: flex; }
+  .nav__toggle { display: none; }
+
+  /* The links stay optically centred whether or not the CTA is present, so
+     they do not shift when the pill's CTA appears. */
+  .nav__links {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  /* The CTA belongs to the pill only — over the hero the hero's own
+     "Explore Our Work" button is the call to action. */
+  .nav.is-scrolled .nav__cta {
+    display: inline-flex;
+    animation: nav-cta-in var(--transition-medium) var(--ease-out) both;
+  }
+  .nav__menu { display: none; }
+  .nav__brand img {
+    height: calc(var(--spacing) * 33);
+    height: round(calc(var(--spacing) * 33), 2px);
+  }
+
+  .nav.is-scrolled .nav__brand img {
+    height: calc(var(--spacing) * 28);
+    height: round(calc(var(--spacing) * 28), 2px);
+  }
+
+  /* The pill: the bar contracts off the page margins and lifts onto its own
+     translucent ground once scrolled. */
+  .nav.is-scrolled .nav__inner {
+    width: min(calc(var(--column) * 9 + var(--gutter) * 8), var(--grid-width));
+    /* Even whole pixels, so the centred pill — and the logo in it — sits on
+       whole pixels. */
+    width: round(min(calc(var(--column) * 9 + var(--gutter) * 8), var(--grid-width)), 2px);
+    /* The button sits as far from the pill's end as from its top and foot
+       (4 each: a 44 button in a 52 pill), so it nests evenly in the curve. */
+    padding-inline: calc(var(--spacing) * 10) calc(var(--spacing) * 4);
+    /* See-through: the ground is mostly the page behind it. The blur and a
+       small saturation lift carry the legibility that the opacity used to,
+       so the links stay readable over photography as well as over white. */
+    background: rgba(255, 255, 255, 0.45);
+    -webkit-backdrop-filter: blur(20px) saturate(1.5);
+    backdrop-filter: blur(20px) saturate(1.5);
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.5),
+      0 calc(var(--spacing) * 6) calc(var(--spacing) * 24) rgba(20, 20, 20, 0.07);
+  }
+
+  .nav.is-scrolled.is-on-dark .nav__inner {
+    background: rgba(20, 20, 20, 0.5);
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+      0 calc(var(--spacing) * 6) calc(var(--spacing) * 24) rgba(0, 0, 0, 0.2);
+  }
+
+  .nav.is-scrolled .nav__brand { margin-left: calc(var(--spacing) * 12); }
+  .nav.is-scrolled .nav__links { gap: calc(var(--spacing) * 24); }
+}
+
+@keyframes nav-cta-in {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav.is-scrolled .nav__cta { animation: none; }
+}

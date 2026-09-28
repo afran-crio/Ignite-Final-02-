@@ -1,0 +1,19 @@
+/* The ghost reserves the final string's width in the same grid cell, so the
+   figure never reflows the line as its digit count grows. */
+.countup {
+  display: inline-grid;
+  font-variant-numeric: tabular-nums;
+}
+
+.countup__ghost,
+.countup__live {
+  grid-area: 1 / 1;
+  white-space: nowrap;
+}
+
+.countup__ghost { visibility: hidden; }
+
+/* The animated digits are for the eye only. Copying picks up the
+   visually-hidden final value instead, so a copied figure reads once
+   ("17", not "17 17"). */
+.countup__live { user-select: none; -webkit-user-select: none; }

@@ -1,0 +1,484 @@
+/* ==========================================================================
+   IGNITE — BASE
+   Reset, element defaults, grid utilities and the shared typographic classes.
+   ========================================================================== */
+
+*,
+*::before,
+*::after,
+::backdrop {
+  box-sizing: border-box;
+  border: 0 solid;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+  tab-size: 4;
+  line-height: 1.5;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+/* The cross-fade between pages (lib/pageTransition.ts): the content fades
+   out quickly while the nav stays, and back in a little slower once the new
+   page is in place. */
+#root > main,
+#root > footer { transition: opacity 300ms var(--ease-out); }
+
+html.page-out #root > main,
+html.page-out #root > footer {
+  opacity: 0;
+  transition-duration: 140ms;
+}
+
+html.page-cut #root > main,
+html.page-cut #root > footer { transition-duration: 0s; }
+
+/* Phones: a section reached by a link stops a little short of the top, so
+   its label clears the nav bar rather than sitting just under it (the few
+   pixels of the section before are hidden behind the bar). */
+@media (max-width: 767px) {
+  main > section[id] { scroll-margin-top: calc(var(--spacing) * 16); }
+}
+
+body {
+  margin: 0;
+  background-color: var(--c-beige);
+  color: var(--c-ink);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-body);
+  letter-spacing: var(--ls-body);
+  overscroll-behavior: none;
+}
+
+* { -webkit-tap-highlight-color: transparent; }
+
+::selection { background: var(--c-selection); }
+
+img, video, svg, picture {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+button, input, textarea, select {
+  font: inherit;
+  color: inherit;
+  background: none;
+  letter-spacing: inherit;
+}
+
+button { cursor: pointer; }
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+h1, h2, h3, h4 {
+  font-size: inherit;
+  font-weight: inherit;
+  text-wrap: balance;
+}
+
+p { text-wrap: pretty; }
+
+ul, ol { list-style: none; }
+
+/* ---------------------------------------------------------------------------
+   GRID
+   `.grid` lays out the 12 fluid columns. `.wrap` is the same width without the
+   column tracks, for content that just needs the page margins.
+   --------------------------------------------------------------------------- */
+.wrap {
+  width: var(--grid-width);
+  margin-inline: auto;
+}
+
+.grid {
+  display: grid;
+  width: var(--grid-width);
+  margin-inline: auto;
+  grid-template-columns: repeat(var(--columns), minmax(0, 1fr));
+  column-gap: var(--gutter);
+}
+
+/* Full-bleed, edge to edge, ignoring the page margins. */
+.bleed {
+  width: var(--screen-width);
+  margin-inline: calc(50% - var(--screen-width) / 2);
+}
+
+/* ---------------------------------------------------------------------------
+   SECTIONS
+   --------------------------------------------------------------------------- */
+.section {
+  padding-block: var(--section-space);
+}
+
+.section--tight {
+  padding-block: var(--section-space-tight);
+}
+
+/* -----------------------------------------------------------------------
+   SECTION TIERS
+   Everything carried the same weight, so nothing read as more important
+   than anything else. Three tiers, expressed only in scale and space so no
+   rules or colour breaks are reintroduced:
+
+     --lead   the argument      About, Works, Metrics
+     (base)   capability        Expertise, Approach
+     --quiet  corroboration     Clientele, Testimonials, Team, Founder
+   ----------------------------------------------------------------------- */
+/* The tiers used to scale the padding (1.45× / 0.72×); every section now
+   carries the same space, so the gap between any two sections is the same
+   down the page. The classes stay as structural markers. */
+.section--lead,
+.section--quiet { padding-block: var(--section-space); }
+
+
+/* -----------------------------------------------------------------------
+   SECTION WASH
+   A soft ambient wash of the accent carries the page from one section into
+   the next. It begins, at nothing, in the lower part of the section before,
+   is at its fullest behind the new section's label and the upper part of its
+   headline, and has faded back to white before the section's content proper
+   begins. One broad radial bloom at ~6% — a warmth in the ground, never a
+   band. The bloom's box reaches above the section and is masked to nothing
+   at both ends, so it never starts or stops on the boundary.
+
+   The box is a fixed height from the top of the section rather than a share
+   of it, so the glow sits at the same height under every heading however
+   tall the section is. Where it sits across the page moves from section to
+   section — `--wash-x` — so the warmth drifts from corner to corner down
+   the page instead of always rising in the same place.
+   ----------------------------------------------------------------------- */
+.section--wash {
+  --wash-x: 44%;
+  /* The bloom's radii and peak, overridable per section. */
+  --wash-w: 64%;
+  --wash-h: 26%;
+  --wash-a: 0.065;
+  position: relative;
+  z-index: 0;
+}
+
+.section--wash-left { --wash-x: 12%; }
+.section--wash-right { --wash-x: 88%; }
+.section--wash-centre { --wash-x: 50%; }
+
+.section--wash::before {
+  content: '';
+  position: absolute;
+  /* Placed so the bloom's peak (48% down its box) lands on the section's
+     label, one section-space below the top edge, whatever that space is. */
+  top: calc(var(--section-space) - var(--spacing) * 336);
+  right: 0;
+  left: 0;
+  height: calc(var(--spacing) * 700);
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    var(--wash-w) var(--wash-h) at var(--wash-x) 48%,
+    rgba(240, 89, 40, var(--wash-a)),
+    transparent 72%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom, transparent 0%, #000 28%, #000 56%, transparent 74%);
+  mask-image: linear-gradient(
+    to bottom, transparent 0%, #000 28%, #000 56%, transparent 74%);
+}
+
+/* The page is one continuous ground. These two modifiers are kept because the
+   sections still mean something structurally, but neither paints a band any
+   more — the flow from section to section is seamless.
+
+   The sections that used to sit on the dark ground still reach for the
+   `--c-on-dark` family, so those tokens are re-pointed at the ink scale here
+   rather than being chased through every rule. */
+.section--dark {
+  --c-on-dark: var(--c-ink);
+  --c-on-dark-soft: var(--c-ink-soft);
+  --c-on-dark-mute: var(--c-mute);
+  --c-line-dark: var(--c-line);
+
+  background: var(--c-beige);
+  color: var(--c-ink);
+}
+
+.section--deep {
+  background: var(--c-beige);
+}
+
+/* The panel: a band one step down from the page, on the warm grey Team and
+   Founder introduced. Sections alternate white and panel down the page, and
+   related sections share one — the change of ground is the divider. Placed
+   after the two rules above so it wins over them at equal specificity. */
+.section--panel {
+  background: var(--c-beige-deep);
+}
+
+/* ---------------------------------------------------------------------------
+   TYPOGRAPHY
+   --------------------------------------------------------------------------- */
+
+/* ---------------------------------------------------------------------------
+   SECTION LABEL
+   Sentence case, set large enough to read as part of the page rather than
+   as fine print. Every section's label is the same. This replaced the small
+   uppercase mono eyebrow on every section.
+   --------------------------------------------------------------------------- */
+.label {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 12);
+  font-size: calc(var(--spacing) * 18);
+  font-weight: var(--fw-medium);
+  line-height: 1.3;
+  color: var(--c-mute);
+}
+
+@media (min-width: 1024px) {
+  .label { font-size: calc(var(--spacing) * 24); }
+}
+
+/* Small uppercase label — figures, step markers and the footer column
+   headings. Set in the sans and spaced out: at 12px almost nobody reads a
+   monospace label as monospace, and the tracking does the same work. Medium
+   weight so it holds its own at this size. */
+.mono {
+  font-family: var(--font-sans);
+  font-size: var(--fs-mono);
+  font-weight: var(--fw-medium);
+  letter-spacing: var(--ls-mono);
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+/* Figures: the site's one numeric face (see --font-numeric), tabular so
+   digits hold their column as they change and a counter never shifts the
+   things beside it. */
+.mono--figure {
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: calc(var(--ls-mono) * 0.6);
+}
+
+.mono--mute { color: var(--c-mute); }
+.mono--accent { color: var(--c-orange); }
+.mono--on-dark { color: var(--c-on-dark-mute); }
+
+.display {
+  font-size: var(--fs-display);
+  font-weight: var(--fw-medium);
+  line-height: var(--lh-display);
+  letter-spacing: var(--ls-display);
+}
+
+.h2 {
+  max-width: var(--measure-heading);
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-medium);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--ls-heading);
+}
+
+/* The title scale that goes with the section tiers. Declared after `.h2` so
+   it wins on source order — both are single-class selectors. A short title
+   like "Representative Transactions" looks underpowered at the base size in a
+   1312px grid; at display size it holds the line. */
+.h2--lead { font-size: var(--fs-display); }
+.h2--quiet { font-size: calc(var(--spacing) * 40); }
+
+.h3 {
+  font-size: var(--fs-h3);
+  font-weight: var(--fw-medium);
+  line-height: 1.2;
+  letter-spacing: var(--ls-heading);
+}
+
+.lead {
+  font-size: var(--fs-lead);
+  line-height: var(--lh-lead);
+  color: var(--c-ink-soft);
+}
+
+.small {
+  font-size: var(--fs-small);
+  line-height: 1.5;
+}
+
+/* Sections used to centre on mobile and release to the left on desktop, but
+   their labels, cards, figures and footer stayed left — two axes in one
+   section. Every section now holds one left edge at every width; the classes
+   stay as structural markers. (The hero keeps its own centred mobile
+   composition.) */
+.centered { text-align: left; }
+
+@media (min-width: 1024px) {
+  .centered--release { text-align: left; }
+}
+
+/* Section titles share one measure, set in `ch` so it is a true character
+   count at any size. `.measure` is no use on a heading: 34em resolves against
+   the heading's own font size, which on a 54px title is 1836px — wider than
+   the grid, so it never binds and the title runs edge to edge.
+
+   26ch lands around 37 characters a line here — Figtree's zero is wide
+   relative to its lowercase, so the ch count runs ahead of the real one. */
+.measure-title { max-width: var(--measure-heading); }
+
+/* Supporting copy under a section headline: one size, one measure, one gap,
+   in every section. */
+.support {
+  max-width: var(--measure-support);
+  margin-top: var(--support-space);
+  font-size: var(--fs-support);
+  font-weight: var(--fw-regular);
+  line-height: 1.5;
+  letter-spacing: var(--ls-body);
+  color: var(--c-ink-soft);
+  text-wrap: pretty;
+}
+
+.measure { max-width: 34em; }
+.measure--narrow { max-width: 22em; }
+.measure--tight { max-width: 16em; }
+
+.centered .measure-title,
+.centered .support,
+.centered .measure,
+.centered .measure--narrow,
+.centered .measure--tight { margin-inline: 0; }
+
+@media (min-width: 1024px) {
+  .centered--release .measure-title,
+  .centered--release .support,
+  .centered--release .measure,
+  .centered--release .measure--narrow,
+  .centered--release .measure--tight { margin-inline: 0; }
+}
+
+/* ---------------------------------------------------------------------------
+   BUTTON — the dark pill from the reference
+   --------------------------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 10);
+  padding: calc(var(--spacing) * 14) calc(var(--spacing) * 24);
+  border-radius: var(--radius-pill);
+  background: var(--c-ink);
+  color: var(--c-beige);
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+  letter-spacing: -0.01em;
+  transition: background var(--transition-fast) var(--ease),
+    color var(--transition-fast) var(--ease),
+    transform var(--transition-fast) var(--ease);
+}
+
+.btn:hover {
+  background: var(--c-orange);
+  color: #fff;
+}
+
+.btn:active { transform: scale(0.98); }
+
+
+.btn--on-dark {
+  background: var(--c-beige);
+  color: var(--c-ink);
+}
+
+/* Inside the former dark sections there is no dark left to invert against, so
+   the pill returns to its standard ink form. */
+.section--dark .btn--on-dark {
+  background: var(--c-ink);
+  color: var(--c-beige);
+}
+
+.btn--on-dark:hover {
+  background: var(--c-orange);
+  color: #fff;
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--c-ink);
+  box-shadow: inset 0 0 0 1px var(--c-line);
+}
+
+.btn--ghost:hover {
+  background: var(--c-ink);
+  color: var(--c-beige);
+  box-shadow: inset 0 0 0 1px var(--c-ink);
+}
+
+/* ---------------------------------------------------------------------------
+   MEDIA — rounded, full-bleed blocks
+   --------------------------------------------------------------------------- */
+.media {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-media);
+  background: var(--c-beige-deep);
+}
+
+.media > img,
+.media > video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ---------------------------------------------------------------------------
+   REVEAL — entrance animation, driven by src/lib/useReveal.ts
+   --------------------------------------------------------------------------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(var(--reveal-distance));
+  /* Quick enough that content is there as the reader reaches it. */
+  transition: opacity 600ms var(--ease-out),
+    transform 700ms var(--ease-out);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { transition: none; }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

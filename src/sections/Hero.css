@@ -1,0 +1,170 @@
+/* ==========================================================================
+   HERO
+
+   Mobile and tablet: a centred stack low in the frame — headline, then the
+   positioning line and the action beneath it.
+
+   Desktop: two columns on the page grid. The headline holds the left grid
+   line (the same line as the logo above it) a fixed distance below the nav;
+   the positioning line and the action form one block on the right, sharing
+   one left edge, level with the lower half of the headline.
+   ========================================================================== */
+
+.hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 100svh;
+  padding-block: var(--nav-height) calc(var(--spacing) * 56);
+  background: var(--c-dark);
+  color: var(--c-on-dark);
+  overflow: hidden;
+}
+
+.hero__media {
+  position: absolute;
+  inset: 0;
+}
+
+/* The picture only chooses the file; the image fills the frame itself. */
+.hero__media picture { display: contents; }
+
+.hero__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Slow settle on load, so the hero does not arrive completely static. */
+  animation: hero-settle 1600ms var(--ease-out) both;
+}
+
+@keyframes hero-settle {
+  from { transform: scale(1.06); }
+  to { transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__media img { animation: none; }
+}
+
+/* Legibility scrim. Darkest under the nav and at the foot of the frame,
+   lighter through the middle so the bridge stays clearly visible; the
+   middle band still carries enough weight for the white and orange type
+   that now sits across it. */
+.hero__scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(18, 18, 18, 0.6) 0%,
+    rgba(18, 18, 18, 0.34) 30%,
+    rgba(18, 18, 18, 0.42) 62%,
+    rgba(18, 18, 18, 0.78) 100%
+  );
+}
+
+.hero__content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+/* ------------------------------------------------------------- headline */
+/* Four set lines at one line-height. 0.95 keeps the block tight without the
+   descender of "Capital." touching the capital E beneath it. */
+.hero__headline {
+  display: flex;
+  flex-direction: column;
+  font-size: var(--fs-hero);
+  font-weight: var(--fw-medium);
+  line-height: 0.95;
+  letter-spacing: var(--ls-display);
+}
+
+.hero__line { display: block; }
+
+/* "Empowering Growth." in the brand orange. ShimmerText paints from
+   currentColor, so setting the colour here is enough. */
+.hero__headline-accent {
+  display: block;
+  color: var(--c-orange);
+}
+
+/* ----------------------------------------------------- positioning + CTA */
+.hero__aside {
+  margin-top: calc(var(--spacing) * 24);
+}
+
+.hero__positioning {
+  max-width: 30em;
+  margin-inline: auto;
+  font-size: var(--fs-lead);
+  line-height: 1.5;
+  color: var(--c-on-dark-soft);
+}
+
+.hero__cta {
+  margin-top: calc(var(--spacing) * 30);
+}
+
+/* --------------------------------------------------------------- scroll */
+/* Centred on the section itself, independent of the content. The tracking
+   adds space after the last letter too; the matching indent puts the same
+   space before the first, so the word's ink is centred, not its box. */
+.hero__scroll {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--spacing) * 18);
+  transform: translateX(-50%);
+  text-indent: var(--ls-mono);
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  /* The composition is set from the top — a fixed step below the nav — so
+     the space between the nav and the headline is the same on every screen,
+     and the lower part of the frame is left to the bridge. */
+  .hero {
+    justify-content: flex-start;
+    padding-top: calc(var(--nav-height) + var(--spacing) * 64);
+    padding-bottom: calc(var(--spacing) * 88);
+  }
+
+  /* On the page's twelve columns: the headline in the first eight, the
+     paragraph and action starting on column nine — the same line the
+     metrics image and the footer's Legal column start on. */
+  .hero__content {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--gutter);
+    align-items: end;
+    text-align: left;
+  }
+
+  /* The size comes from --fs-hero, which holds "Empowering" inside ~58% of
+     the grid. The small negative indent pulls the side-bearing of the first
+     letters back so their ink, not their box, sits on the logo's line. */
+  .hero__headline {
+    grid-column: 1 / span 8;
+    margin-left: -0.045em;
+  }
+
+  /* One block: the paragraph ~360px wide, the action directly beneath it on
+     the same left edge. Lifted by one headline line from the foot of the
+     headline, so the block centres on the lower-middle of the composition
+     rather than sitting on its baseline. */
+  .hero__aside {
+    grid-column: 9 / span 4;
+    max-width: calc(var(--spacing) * 380);
+    margin: 0 0 calc(var(--fs-hero) * 0.95);
+  }
+
+  .hero__positioning {
+    max-width: none;
+    margin: 0;
+  }
+
+  .hero__cta { margin-top: calc(var(--spacing) * 30); }
+
+  .hero__scroll { display: block; }
+}

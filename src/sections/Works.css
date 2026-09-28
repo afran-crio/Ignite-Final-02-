@@ -1,0 +1,424 @@
+/* ==========================================================================
+   OUR WORK — a rail of transaction blocks
+
+   The reader moves this one themselves, by dragging or swiping it.
+   Three and a bit blocks sit on screen at a time, so the next is always
+   visibly waiting. Each block carries the amount at its head and the
+   amount set at poster scale through the middle of the block and the
+   description at its foot.
+
+   The amount is the artwork. A capital advisory firm's proof is the size of
+   the deals it structures, so the figure is given the room a photograph would
+   have taken — and the section needs no photography to carry weight. Should
+   artwork arrive later, `image` on the transaction switches the block to a
+   dark treatment and the figure goes white over the scrim.
+   ========================================================================== */
+
+/* The dark section: the hero's near-black, so the photographs and the
+   accent carry the section and the page has one deep beat in its middle.
+   The shared tokens are re-pointed for the dark ground here, so the label,
+   and the headline follow. */
+.works {
+  --c-mute: rgba(255, 255, 255, 0.5);
+  --c-line: rgba(255, 255, 255, 0.2);
+  --c-on-dark: #fff;
+  --c-on-dark-soft: rgba(255, 255, 255, 0.66);
+  background: var(--c-dark);
+  color: var(--c-on-dark);
+}
+
+.works__eyebrow { margin-bottom: var(--eyebrow-space); }
+
+.works__title { color: var(--c-on-dark); }
+
+
+.works__carousel { margin-top: var(--title-space); }
+
+/* Embla needs this clipped, and the slides sit flush against its top edge —
+   so the 4px lift on hover was being sliced straight off, flattening the
+   card's rounded top corners. The padding gives the lift somewhere to go
+   (overflow clips at the padding edge), and the matching negative margin
+   keeps the rail's position in the layout unchanged. */
+.works__viewport {
+  overflow: hidden;
+  padding-block: calc(var(--spacing) * 10);
+  margin-block: calc(var(--spacing) * -10);
+  /* The grab cursor says the rail can be dragged, as in the testimonials. */
+  cursor: grab;
+}
+
+.works__viewport:active,
+.works__viewport:active .works__tile { cursor: grabbing; }
+
+.works__track {
+  display: flex;
+  align-items: stretch;
+  gap: var(--gutter);
+  /* Embla drives transform on this element. */
+  backface-visibility: hidden;
+  touch-action: pan-y pinch-zoom;
+}
+
+/* The rail runs edge to edge of the screen, past the grid on both sides,
+   so tiles are seen to slide in and out off the page rather than being cut
+   at the margins. Tiles are sized from the grid (`--slide`), not from the
+   wider viewport; the first and last slides carry the margin as padding,
+   so at either end of the rail the end tile stops on the grid's edge. */
+.works__viewport { margin-inline: calc(0px - var(--margin)); }
+
+.works__slide {
+  --slide: calc(var(--grid-width) * 0.86);
+  flex: 0 0 var(--slide);
+  min-width: 0;
+  display: flex;
+}
+
+.works__slide:first-child {
+  flex-basis: calc(var(--slide) + var(--margin));
+  padding-left: var(--margin);
+}
+
+.works__slide:last-child {
+  flex-basis: calc(var(--slide) + var(--margin));
+  padding-right: var(--margin);
+}
+
+/* Entrance: as the rail scrolls into view (the reveal around it sets
+   `is-visible` once) the cards glide in from the right, each a beat behind
+   the last, and settle over two seconds — the rail arrives in motion rather
+   than flat, and then holds still. A transform on the slide, not the track,
+   so it never interferes with the carousel's own positioning. */
+.reveal.is-visible .works__slide {
+  animation: works-slide-in 2000ms var(--ease-out) both;
+  animation-delay: calc(var(--i) * 110ms);
+}
+
+@keyframes works-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(calc(var(--spacing) * 260));
+  }
+  25% { opacity: 1; }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal.is-visible .works__slide { animation: none; }
+}
+
+/* ------------------------------------------------------------------- tile
+   "Rising into colour". At rest the photograph is a warm monochrome under a
+   gradient that is clear at the head and deep at the foot; a frosted tag
+   names the sector, and the figure with its deal
+   type sits at the foot. When the tile opens (pointer, focus, a tap, or the
+   intro) the photograph blooms into full colour as it pushes in, the accent
+   glow rises from the foot, and the description opens beneath the figure,
+   lifting it — every movement bottom to top. One tile is open at a time;
+   see Works.tsx. */
+.works__tile {
+  /* The figure is sized from the tile's own width (see .works__amount). */
+  container-type: inline-size;
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: calc(var(--spacing) * 24);
+  width: 100%;
+  min-height: calc(var(--spacing) * 360);
+  padding: var(--card-pad);
+  overflow: hidden;
+  text-align: left;
+  border-radius: var(--radius-media);
+  background-color: #2a2a2a;
+  /* A hairline of light round the edge lifts the tile off the dark ground. */
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  color: #fff;
+  cursor: grab;
+  transition:
+    transform 600ms var(--ease-out),
+    box-shadow 600ms var(--ease-out);
+}
+
+.works__tile:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: calc(var(--spacing) * 4);
+}
+
+/* ------------------------------------------------------------- photograph
+   Warm monochrome at rest — every tile in one tone, so the rail reads as a
+   set on the dark ground — blooming to full colour and pushing in when the
+   tile opens. */
+.works__photo {
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+  background-image: var(--tile-image, none);
+  background-size: cover;
+  background-position: 50%;
+  background-repeat: no-repeat;
+  filter: grayscale(1) sepia(0.18) brightness(0.82) contrast(1.05);
+  transition:
+    transform 1400ms var(--ease-out),
+    filter 900ms var(--ease-out);
+}
+
+.works__tile.is-active .works__photo {
+  transform: scale(1.06);
+  filter: none;
+}
+
+/* The scrim: clear across the upper half so the photograph shows, deep at
+   the foot where the type sits. */
+.works__tile::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background: linear-gradient(
+    to top,
+    rgba(12, 12, 12, 0.92) 0%,
+    rgba(12, 12, 12, 0.6) 30%,
+    rgba(12, 12, 12, 0.08) 62%,
+    rgba(12, 12, 12, 0.22) 100%
+  );
+}
+
+/* The accent, rising from the foot when the tile opens. */
+.works__glow {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: linear-gradient(
+    0deg,
+    rgba(240, 89, 40, 0.85) 0%,
+    rgba(240, 89, 40, 0.45) 22%,
+    rgba(240, 89, 40, 0.1) 44%,
+    transparent 58%
+  );
+  transform: translateY(100%);
+  transition: transform 700ms var(--ease-out);
+}
+
+/* ------------------------------------------------------------------- top */
+.works__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: calc(var(--spacing) * 12);
+}
+
+/* The sector as a frosted tag, readable over any photograph. */
+.works__industry {
+  padding: calc(var(--spacing) * 6) calc(var(--spacing) * 12);
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4);
+  backdrop-filter: blur(12px) saturate(1.4);
+  font-size: calc(var(--spacing) * 13);
+  font-weight: var(--fw-medium);
+  line-height: 1.3;
+  color: #fff;
+}
+
+/* ------------------------------------------------------------------ foot */
+.works__foot {
+  display: flex;
+  flex-direction: column;
+}
+
+/* The figure's size is the step's size or the size at which the widest
+   figure ("$200+ million", ~4em) fills the tile, whichever is smaller — so
+   on narrower laptops, where the tiles are narrower, it never runs off. */
+.works__amount {
+  --amount: calc(var(--spacing) * 44);
+  white-space: nowrap;
+  font-size: min(var(--amount), 22.5cqi);
+  font-weight: var(--fw-medium);
+  line-height: 0.94;
+  letter-spacing: var(--ls-display);
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+}
+
+/* The unit ("million") beside the figure, on its baseline, at under half
+   its size — the figure is the fact, the unit qualifies it. */
+.works__unit {
+  font-size: 0.42em;
+  font-weight: var(--fw-regular);
+  letter-spacing: var(--ls-heading);
+}
+
+/* The deal type, always shown, in the accent. On the open tile the glow
+   sits behind it, so it turns white there to hold its contrast. */
+.works__solution {
+  margin-top: calc(var(--spacing) * 12);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  line-height: 1.3;
+  color: var(--c-orange);
+  transition: color 500ms var(--ease-out);
+}
+
+.works__tile.is-active .works__solution { color: #fff; }
+
+/* The description opens beneath the deal type: a 0fr → 1fr row, so its
+   height grows to fit and lifts the figure above it. */
+.works__detail {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows 600ms var(--ease-out),
+    opacity 400ms var(--ease-out);
+}
+
+.works__detail-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.works__description {
+  padding-top: calc(var(--spacing) * 8);
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
+  color: rgba(255, 255, 255, 0.88);
+  text-wrap: pretty;
+}
+
+/* ----------------------------------------------------------- active state */
+.works__tile.is-active {
+  transform: translateY(calc(var(--spacing) * -4));
+  box-shadow:
+    inset 0 0 0 1px rgba(240, 89, 40, 0.5),
+    0 calc(var(--spacing) * 18) calc(var(--spacing) * 40) rgba(0, 0, 0, 0.35);
+}
+
+.works__tile.is-active .works__glow { transform: translateY(0); }
+
+.works__tile.is-active .works__detail {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transition:
+    grid-template-rows 600ms var(--ease-out),
+    opacity 500ms var(--ease-out) 120ms;
+}
+
+/* The intro's close (`is-closing`, set by Works.tsx for 1.5s after the
+   hold): slower and softer than a hover leaving, so the glow is seen to
+   sink out of the tile and the colour to drain. */
+.works__tile.is-closing .works__glow {
+  transition: transform 1400ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.works__tile.is-closing .works__photo {
+  transition:
+    transform 1400ms cubic-bezier(0.65, 0, 0.35, 1),
+    filter 1400ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.works__tile.is-closing .works__detail {
+  transition:
+    grid-template-rows 1200ms cubic-bezier(0.65, 0, 0.35, 1),
+    opacity 700ms ease-in;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .works__tile,
+  .works__photo,
+  .works__glow,
+  .works__solution,
+  .works__detail { transition-duration: 1ms; }
+}
+
+@media (min-width: 768px) {
+  .works__slide { --slide: calc((var(--grid-width) - var(--gutter)) / 2.15); }
+  .works__tile { min-height: calc(var(--spacing) * 400); }
+  .works__amount { --amount: calc(var(--spacing) * 54); }
+}
+
+@media (min-width: 1024px) {
+  /* Three across with a fourth entering from the edge. */
+  .works__slide { --slide: calc((var(--grid-width) - var(--gutter) * 3) / 3.35); }
+
+  .works__tile { min-height: calc(var(--spacing) * 460); }
+  .works__amount { --amount: calc(var(--spacing) * 72); }
+  .works__description { font-size: var(--fs-body); }
+}
+
+/* Touch has no hover to open a tile, so there every tile is shown open:
+   full colour, the glow up, the description in. */
+@media (hover: none) {
+  .works__photo { filter: none; }
+  .works__glow { transform: none; }
+  .works__solution { color: #fff; }
+  .works__detail {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+}
+
+/* ------------------------------------------------------------ pinned rail
+   Where the page scroll drives the rail (Works.tsx): the section is as tall
+   as the screen plus the rail's travel, and its content holds in place —
+   centred in the screen — while the reader scrolls through it. Each pixel
+   of scroll moves the rail about 1.25px, so the hold stays short. */
+.works.is-pinned {
+  height: calc(100vh + var(--travel, 0px) * 0.8);
+  height: calc(100svh + var(--travel, 0px) * 0.8);
+  padding-block: 0;
+}
+
+.works.is-pinned > .wrap {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100vh;
+  height: 100svh;
+  padding-top: var(--nav-height);
+}
+
+/* The scroll moves it, and so does a sideways drag. */
+.works.is-pinned .works__viewport,
+.works.is-pinned .works__tile { cursor: grab; }
+
+/* Sideways drags come to the rail; up-and-down swipes still scroll the
+   page (which moves the rail too). */
+.works.is-pinned .works__viewport {
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.works.is-pinned .works__track.is-dragging,
+.works.is-pinned .works__track.is-dragging .works__tile { cursor: grabbing; }
+
+.works__track.is-dragging .works__tile { pointer-events: none; }
+
+.works.is-pinned .works__track { will-change: transform; }
+
+/* Kept light while the rail moves: seven frosted tags blurring what moves
+   behind them had the browser repainting every tile each frame. A solid
+   tint reads the same over the photographs; each tile paints on its own. */
+.works.is-pinned .works__industry {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background: rgba(20, 20, 20, 0.45);
+}
+
+.works.is-pinned .works__tile { contain: paint; }
+
+.works__track.is-moving .works__tile { pointer-events: none; }
+
+/* On short windows the held section must fit the screen: the tiles give up
+   height before they would run past its foot. */
+@media (max-height: 760px) {
+  .works.is-pinned .works__tile { min-height: min(calc(var(--spacing) * 440), 50svh); }
+  .works.is-pinned .works__carousel { margin-top: calc(var(--title-space) * 0.6); }
+}

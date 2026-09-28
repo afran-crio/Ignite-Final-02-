@@ -1,0 +1,61 @@
+/* Split-flap figure. Each character is its own flap, hinged through its
+   centre line, with its own vanishing point: a shared perspective on the
+   parent sheared the flaps at the far ends of a wide figure. See FlipText.tsx. */
+.flip {
+  --flip-depth: calc(var(--spacing) * 900);
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.flip__glyph { display: inline-block; }
+
+.flip__char {
+  display: inline-block;
+  transform-origin: 50% 50%;
+  backface-visibility: hidden;
+  /* Hidden until the figure scrolls into view. */
+  opacity: 0;
+  transform: perspective(var(--flip-depth)) rotateX(-90deg);
+}
+
+/* Entrance: each flap swings up into place in turn. */
+.flip.is-live .flip__char {
+  animation: flip-in 640ms var(--ease-out) both;
+  animation-delay: calc(var(--i) * 55ms);
+}
+
+/* A numeral stepping up: a quicker flip with no stagger, from the top edge
+   the way a departures board drops its next card. */
+.flip.is-live .flip__char--step {
+  animation: flip-step 200ms var(--ease) both;
+  animation-delay: 0ms;
+}
+
+/* Reduced motion: the final string, no flaps. */
+.flip.is-still .flip__char {
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes flip-in {
+  from {
+    opacity: 0;
+    transform: perspective(var(--flip-depth)) rotateX(-90deg);
+  }
+  55% { opacity: 1; }
+  to {
+    opacity: 1;
+    transform: perspective(var(--flip-depth)) rotateX(0);
+  }
+}
+
+@keyframes flip-step {
+  from {
+    opacity: 0.6;
+    transform: perspective(var(--flip-depth)) rotateX(70deg);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(var(--flip-depth)) rotateX(0);
+  }
+}

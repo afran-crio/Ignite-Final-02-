@@ -1,0 +1,296 @@
+/* ==========================================================================
+   FOUNDER'S PERSPECTIVE — a personal conviction, not another testimonial
+
+   On a warm-grey ground, one step down from the page, shared with the
+   Leadership Team above it so the two read as one panel: the people, then
+   the founder's word. The quotation in two levels — the anchor line at the
+   section-headline scale, the rest as one paragraph running the width a
+   level down — with a faint oversized quotation mark behind the words,
+   and beneath, the attribution with the founder's portrait in a circle. The
+   accent wash the section shares with the rest of the page sits to the
+   right.
+   ========================================================================== */
+
+/* On the white ground, apart from the grey panel of the team above: the
+   founder's word is its own section, and the page's close. */
+
+.founder__eyebrow { margin-bottom: var(--eyebrow-space); }
+
+.founder__body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: 0;
+}
+
+/* The quotation mark as a watermark: oversized, the accent at a whisper,
+   hung behind the top-left of the anchor line. The system serif's glyph is
+   the classic mark; the sans's is two wedges that read as slashes at this
+   size. A single glyph used as a graphic, not a second typeface. */
+.founder__mark {
+  position: absolute;
+  /* Behind the first line of the quotation, not the label above it. */
+  top: calc(var(--spacing) * 4);
+  left: calc(var(--spacing) * -6);
+  z-index: -1;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: calc(var(--spacing) * 200);
+  font-weight: 700;
+  line-height: 0.62;
+  color: var(--c-orange);
+  opacity: 0.12;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* The anchor line: the section-headline scale and measure, in ink. */
+.founder__lead {
+  max-width: var(--measure-heading);
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-medium);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--ls-heading);
+  color: var(--c-ink);
+  text-wrap: balance;
+}
+
+/* The rest of the message: one paragraph, one voice, a clear level down
+   from the anchor line and running most of the width beneath it. */
+.founder__thought {
+  max-width: var(--measure-support);
+  margin-top: var(--support-space);
+  font-size: var(--fs-support);
+  font-weight: var(--fw-regular);
+  line-height: 1.5;
+  letter-spacing: var(--ls-body);
+  color: var(--c-ink-soft);
+  text-wrap: pretty;
+}
+
+/* ------------------------------------------------------------ attribution */
+.founder__quote { margin: 0; }
+
+/* The foot: the attribution beneath the statement. */
+.founder__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: calc(var(--spacing) * 24) var(--gutter);
+  width: 100%;
+  margin-top: var(--title-space);
+}
+
+.founder__attribution {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: calc(var(--spacing) * 16);
+  text-align: left;
+}
+
+
+.founder__photo {
+  flex: none;
+  /* The team cards' ground, so the cut-out portrait sits in a full disc. */
+  background: #fff5f0;
+  width: calc(var(--spacing) * 56);
+  height: calc(var(--spacing) * 56);
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+.founder__name {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-heading);
+  color: var(--c-ink);
+}
+
+/* The same step between name and title as on the Team cards above. */
+.founder__title { margin-top: calc(var(--spacing) * 8); }
+
+@media (min-width: 1024px) {
+  .founder__body { align-items: flex-start; }
+
+  /* Hung inside the grid, behind the first line — not out in the margin,
+     where it pulled the section's left edge off the page's line. */
+  .founder__mark {
+    top: calc(var(--spacing) * 6);
+    left: calc(var(--spacing) * -6);
+    font-size: calc(var(--spacing) * 260);
+  }
+
+  .founder__attribution { justify-content: flex-start; }
+  .founder__foot { max-width: var(--measure-support); }
+  .founder__photo { width: calc(var(--spacing) * 72); height: calc(var(--spacing) * 72); }
+  .founder__name { font-size: var(--fs-body); }
+}
+
+/* --------------------------------------------------------------- figure
+   Four fine rings closing in on the logo's mark: structure outermost,
+   trust innermost and in the accent. Each ring's name sits on its top
+   edge, the line opening around it. When revealed, the rings draw in
+   from the outside one after another, and the mark settles at the core;
+   afterwards the rings breathe very slightly, out of step. */
+.founder__figure { margin-top: calc(var(--title-space) + var(--spacing) * 16); }
+
+.founder__rings {
+  position: relative;
+  width: 100%;
+  /* A step smaller on phones, where it sits beneath the statement. The
+     rings breathe up to 2.5% larger (see below), so the box is inset by
+     half that on each side: at their fullest the outer ring's edge lands
+     exactly on the grid line. On phones, where it stands alone beneath the
+     statement, it is centred on the page. */
+  max-width: min(calc(var(--spacing) * 420), 78%);
+  margin-inline: auto;
+  aspect-ratio: 1;
+  /* Ring labels are placed in units of this box's width. */
+  container-type: inline-size;
+}
+
+.founder__ring {
+  /* 0 outermost to 1 innermost. */
+  --t: calc(var(--i) / (var(--n) - 1));
+  --size: calc(100% - var(--i) * 22%);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  translate: -50% -50%;
+}
+
+/* The ring's line, drawn on a layer of its own so it can open a gap at
+   the top for the name to sit in — no patch behind the text. Founder.tsx
+   measures each name and sets --gap, the angle of the opening. */
+.founder__ring::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(240, 89, 40, calc(0.2 + var(--t) * 0.5));
+  -webkit-mask-image: conic-gradient(from calc(var(--gap, 0deg) / 2) at 50% 50%, #000 calc(360deg - var(--gap, 0deg)), transparent 0);
+  mask-image: conic-gradient(from calc(var(--gap, 0deg) / 2) at 50% 50%, #000 calc(360deg - var(--gap, 0deg)), transparent 0);
+}
+
+.founder__ring-name {
+  position: absolute;
+  left: 50%;
+  /* On the ring's top edge, as a label on a dial. */
+  top: 0;
+  translate: -50% -50%;
+  line-height: 1;
+  font-size: calc(var(--spacing) * 11);
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--c-ink-soft);
+}
+
+.founder__ring:last-of-type .founder__ring-name { color: var(--c-orange); }
+
+/* The logo's mark at the core. */
+.founder__core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--spacing) * 34);
+  height: calc(var(--spacing) * 34);
+  translate: -50% -50%;
+}
+
+.founder__core-back,
+.founder__core-front {
+  position: absolute;
+  width: 60%;
+  height: 60%;
+  border-radius: calc(var(--spacing) * 2);
+}
+
+.founder__core-back { bottom: 0; left: 0; background: var(--c-orange); }
+.founder__core-front { top: 0; right: 0; background: #fe9826; }
+
+/* Entrance: each ring grows in from nothing, outermost first, then the
+   mark lands at the centre. */
+.reveal .founder__ring {
+  opacity: 0;
+  transform: scale(0.6);
+}
+
+.reveal .founder__core {
+  opacity: 0;
+  transform: scale(0.4);
+}
+
+.reveal.is-visible .founder__ring {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 700ms var(--ease-out),
+    transform 1000ms var(--ease-out);
+  transition-delay: calc(150ms + var(--i) * 130ms);
+  animation: founder-breathe 6s var(--ease) calc(2000ms + var(--i) * 700ms) infinite;
+}
+
+.reveal.is-visible .founder__core {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 500ms var(--ease-out),
+    transform 800ms cubic-bezier(0.34, 1.4, 0.64, 1);
+  transition-delay: 750ms;
+}
+
+@keyframes founder-breathe {
+  0%, 100% { scale: 1; }
+  50% { scale: 1.025; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal .founder__ring,
+  .reveal .founder__core { opacity: 1; transform: none; transition: none; }
+  .reveal.is-visible .founder__ring { animation: none; }
+}
+
+/* Desktop: the statement in the first seven columns, the rings in the
+   last four, centred on the statement. */
+@media (min-width: 1024px) {
+  .founder__grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--gutter);
+    align-items: center;
+  }
+
+  /* The label on a row of its own; the rings centred on the statement
+     beneath it — the quotation through to the name plate — as the About
+     figure lines up with its headline and text rather than the label. */
+  .founder__text { display: contents; }
+
+  .founder__eyebrow { grid-column: 1 / span 7; grid-row: 1; }
+
+  /* Held to the top of its row, so the label's spacing above the quotation
+     is the page's own; the rings' top meets the quotation's first line. */
+  .founder__body { grid-column: 1 / span 7; grid-row: 2; align-self: start; }
+
+  .founder__figure {
+    grid-column: 9 / span 4;
+    grid-row: 2;
+    margin-top: 0;
+  }
+
+  /* Desktop: against the grid's right edge, as the About figure is. */
+  .founder__rings {
+    max-width: calc(var(--spacing) * 420);
+    width: 97.5%;
+    margin-inline: auto 1.25%;
+  }
+  .founder__ring-name { font-size: calc(var(--spacing) * 12); }
+  .founder__core { width: calc(var(--spacing) * 52); height: calc(var(--spacing) * 52); }
+}

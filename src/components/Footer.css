@@ -1,0 +1,404 @@
+/* The footer closes the page on the dark ground of the hero, with light
+   type and the accent kept for the logo, the underlines and the wordmark. */
+.footer {
+  --c-on-dark: #ffffff;
+  --c-on-dark-soft: rgba(255, 255, 255, 0.85);
+  --c-on-dark-mute: rgba(255, 255, 255, 0.5);
+  --c-line-dark: rgba(255, 255, 255, 0.12);
+
+  padding-block: calc(var(--spacing) * 40) calc(var(--spacing) * 24);
+  background: var(--c-dark);
+  color: var(--c-on-dark);
+}
+
+/* ------------------------------------------------------------------- CTA
+   The invitation above the columns: the headline, its second half in
+   grey, and the line beneath it; beside them, on the Contact column's line,
+   the email under a small label with a note beneath; a hairline under the
+   row. Stacked below desktop. */
+.footer__cta {
+  display: grid;
+  gap: calc(var(--spacing) * 28) var(--gutter);
+  margin-bottom: calc(var(--spacing) * 40);
+  padding-bottom: calc(var(--spacing) * 40);
+  border-bottom: 1px solid var(--c-line-dark);
+}
+
+.footer__cta-heading {
+  font-size: calc(var(--fs-h2) * 1.12);
+  font-weight: var(--fw-regular);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--c-on-dark);
+}
+
+.footer__cta-rest { color: rgba(255, 255, 255, 0.4); }
+
+.footer__cta-support {
+  max-width: 34em;
+  margin-top: calc(var(--spacing) * 12);
+  font-size: var(--fs-small);
+  line-height: 1.6;
+  color: var(--c-on-dark-mute);
+}
+
+.footer__cta-contact {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(var(--spacing) * 10);
+}
+
+/* Underlined at rest in a faint line so it reads as a link; the line
+   turns orange under the pointer. */
+.footer__cta-mail {
+  font-size: calc(var(--spacing) * 20);
+  font-weight: var(--fw-medium);
+  letter-spacing: -0.01em;
+  color: var(--c-on-dark);
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.3);
+  text-decoration-thickness: 1px;
+  text-underline-offset: calc(var(--spacing) * 8);
+  transition: text-decoration-color var(--transition-fast) var(--ease);
+}
+
+.footer__cta-mail:hover { text-decoration-color: var(--c-orange); }
+
+/* The response note, which gives way to "Email copied" for a moment when
+   a click copies the address: both in one cell, cross-fading. */
+.footer__cta-note {
+  display: grid;
+  margin-top: calc(var(--spacing) * 4);
+  font-size: var(--fs-small);
+  line-height: 1.5;
+  color: var(--c-on-dark-mute);
+}
+
+.footer__cta-note > span {
+  grid-area: 1 / 1;
+  transition: opacity 250ms var(--ease-out);
+}
+
+.footer__cta-note .footer__copied-text {
+  font-size: var(--fs-mono);
+  font-weight: var(--fw-medium);
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  align-self: center;
+  color: var(--c-orange);
+  opacity: 0;
+}
+
+.footer__cta-note.is-copied > span:first-child { opacity: 0; }
+.footer__cta-note.is-copied .footer__copied-text { opacity: 1; }
+
+.footer__link { position: relative; }
+
+/* The note shown for a moment beside the Contact column's Email entry
+   when a click copies the address. */
+.footer__copied {
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  margin-left: calc(var(--spacing) * 10);
+  font-size: var(--fs-mono);
+  font-weight: var(--fw-medium);
+  letter-spacing: var(--ls-mono);
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--c-orange);
+  opacity: 0;
+  translate: 0 -50%;
+  transition: opacity 250ms var(--ease-out);
+  pointer-events: none;
+}
+
+.footer__copied.is-shown { opacity: 1; }
+
+.footer__cta-mail:focus-visible,
+.footer__link:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: calc(var(--spacing) * 3);
+}
+
+.footer__inner {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: calc(var(--spacing) * 24) var(--gutter);
+}
+
+/* Phones: the brand and the contact details full width; Navigate and
+   Legal side by side between them. */
+.footer__brand,
+.footer__inner > .footer__nav:last-child { grid-column: 1 / -1; }
+
+.footer__logo {
+  /* The full logo with its brand line; tall enough for the line to read.
+     A little smaller on phones, where it would otherwise outweigh the
+     footer, but not so small that the brand line stops reading. */
+  height: calc(var(--spacing) * 74);
+  width: auto;
+}
+
+/* Below desktop the logo heads the columns: given room above them. */
+.footer__brand { margin-bottom: calc(var(--spacing) * 12); }
+
+
+.footer__nav {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(var(--spacing) * 9);
+}
+
+.footer__nav-heading { margin-bottom: calc(var(--spacing) * 5); }
+
+.footer__link {
+  font-size: var(--fs-small);
+  color: var(--c-on-dark-soft);
+  /* Plain at rest; the orange underline is drawn in under the pointer. */
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 2px;
+  text-underline-offset: calc(var(--spacing) * 5);
+  transition: color var(--transition-fast) var(--ease),
+    text-decoration-color var(--transition-fast) var(--ease);
+}
+
+.footer__link:hover {
+  color: var(--c-on-dark);
+  text-decoration-color: var(--c-orange);
+}
+
+/* Set as the links beside it so the column reads as one set, but not a
+   link yet — no hover and no pointer — because site.linkedinUrl is still
+   empty; fill that in and the entry renders as a real .footer__link. */
+.footer__muted {
+  font-size: var(--fs-small);
+  color: var(--c-on-dark-soft);
+}
+
+.footer__address {
+  display: flex;
+  flex-direction: column;
+  font-size: var(--fs-small);
+  font-style: normal;
+  line-height: 1.5;
+  color: var(--c-on-dark-mute);
+}
+
+.footer__base {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--spacing) * 10) var(--gutter);
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: calc(var(--spacing) * 32);
+}
+
+@media (min-width: 768px) {
+  .footer__logo { height: calc(var(--spacing) * 88); }
+
+  /* Tablets: the logo above, then Navigate, Legal and Contact side by side. */
+  .footer__inner {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--block-space) var(--gutter);
+  }
+
+  .footer__inner > .footer__nav:last-child { grid-column: auto; }
+}
+
+@media (min-width: 1024px) {
+  /* On the page's twelve columns, four equal parts of three columns each:
+     the brand, Navigate, Legal and Contact, spread across the width. */
+  .footer__inner {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--gutter);
+  }
+
+  .footer__brand,
+  .footer__inner > .footer__nav,
+  .footer__inner > .footer__nav:last-child { grid-column: span 3; }
+
+  .footer__brand { margin-bottom: 0; }
+
+  .footer { padding-top: calc(var(--spacing) * 72); }
+
+  /* The headline across the first eight columns; the email on the
+     Contact column's line (the last three), level with the headline's
+     foot. */
+  .footer__cta {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    align-items: end;
+    margin-bottom: calc(var(--spacing) * 48);
+    padding-bottom: calc(var(--spacing) * 48);
+  }
+
+  .footer__cta-text { grid-column: 1 / span 8; }
+  .footer__cta-contact { grid-column: 10 / span 3; }
+
+  .footer__cta-mail { font-size: calc(var(--spacing) * 22); }
+}
+
+/* ---------------------------------------------------------------- wordmark
+   "ignite" across the full width of the footer, in faint white — texture,
+   so the orange logo stays the only coloured one — its lower part cropped by the page's foot — a quiet sign-off.
+   Sized in vw so it spans the screen at every width. */
+.footer {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  /* The columns at the head, the copyright row pinned to the foot, so the
+     text frames the wordmark top and bottom rather than bunching at the
+     top over an empty band. */
+  display: flex;
+  flex-direction: column;
+}
+
+.footer__wordmark {
+  /* Behind the footer's content, the full grid width, its baseline just
+     above the page's foot so only the descender of the g is cropped. Footer.tsx
+     sizes it (--wm) so its ink spans the grid (2.1697em) and makes the
+     footer tall enough for its tallest ink — the dots of the i's, 0.721em
+     above the baseline — to sit 24px inside the top. In a
+     line-height of 1 the baseline sits 0.85em from the box's top, i.e.
+     0.15em above the box's bottom. */
+  position: absolute;
+  /* On the grid's left line, spanning it; the indent pulls the first
+     letter's side-bearing (0.063em) back onto it, so the word sits centred
+     margin to margin. */
+  left: calc((100% - var(--grid-width)) / 2);
+  /* Set a tenth of the word's height lower than standing whole on the
+     foot: the baseline 0.05em below it, so the letters' feet and the g's
+     descender run off the page. */
+  bottom: -0.2em;
+  z-index: -1;
+  margin: 0;
+  text-indent: -0.063em;
+  /* The e's curve reaches 0.032em past the word's advance; the colour is
+     painted only inside the box, so the box is given room for it or the
+     e is sliced off. */
+  padding-right: 0.08em;
+  font-size: var(--wm, calc(var(--grid-width) / 2.1697));
+  font-weight: var(--fw-medium);
+  line-height: 1;
+  letter-spacing: -0.06em;
+  white-space: nowrap;
+  /* Painted letter by letter (see .footer__letter). */
+  color: transparent;
+  /* Kept clear of the headline — nothing above the rule under it
+     (--wm-rule), rising in softly below it — then held back to a third of
+     its strength behind the columns, so the letters recede behind the
+     links and address rather than looking cut by them, and up to full
+     strength below them (--wm-fade). Both measured in Footer.tsx. */
+  --wm-mask: linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent var(--wm-rule, 0px),
+    rgba(0, 0, 0, 0.3) calc(var(--wm-rule, 0px) + 120px),
+    rgba(0, 0, 0, 0.3) calc(var(--wm-fade, 0px) - 60px),
+    #000 calc(var(--wm-fade, 0px) + 20px)
+  );
+  -webkit-mask-image: var(--wm-mask);
+  mask-image: var(--wm-mask);
+  user-select: none;
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------ letters
+   The wordmark set letter by letter, so each can move on its own. Each
+   letter paints its own copy of the gradient (the same vertical fade, so
+   the word reads as one), in a box widened past its glyph so no edge of
+   the ink is clipped. */
+.footer__letter {
+  display: inline-block;
+  /* The word's indent (which pulls its first letter onto the grid line) is
+     inherited; within a letter it would pull each one left again. */
+  text-indent: 0;
+  padding-inline: 0.1em;
+  margin-inline: -0.1em;
+  /* Over the faint white, a wash of the accent that comes up as the
+     pointer nears the letter (--near, set in Footer.tsx); the letter lifts
+     a little with it. */
+  background:
+    linear-gradient(180deg, rgba(240, 89, 40, calc(var(--near) * 0.6)) 0%, rgba(240, 89, 40, calc(var(--near) * 0.25)) 100%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.03) 60%, rgba(255, 255, 255, 0.015) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  transform: translateY(calc(var(--near) * -0.05em));
+  transition: transform 500ms var(--ease-out), --near 400ms var(--ease-out);
+}
+
+/* Registered so it can ease rather than jump. */
+@property --near {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+.footer__word {
+  display: inline-block;
+  white-space: pre;
+  transition: color 300ms var(--ease-out);
+}
+
+/* The grey half of the headline: each word comes up to white under the
+   pointer. */
+@media (hover: hover) {
+  .footer__cta-rest .footer__word:hover { color: var(--c-on-dark); }
+}
+
+/* ---------------------------------------------------------------- entrance
+   Once the footer comes into view (Footer.tsx adds .is-in): the headline
+   rises in word by word, the line and the email beneath follow, and the
+   wordmark's letters rise in turn from the foot. It plays once. The parts
+   are set back only while the footer is armed (.is-armed, added by the
+   script), so without it — or under reduced motion — all simply shows. */
+.footer.is-armed .footer__word {
+  opacity: 0;
+  transform: translateY(0.45em);
+  transition:
+    opacity 700ms var(--ease-out) calc(var(--w) * 70ms),
+    transform 900ms var(--ease-out) calc(var(--w) * 70ms),
+    color 300ms var(--ease-out);
+}
+
+.footer.is-armed .footer__cta-support,
+.footer.is-armed .footer__cta-contact {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 700ms var(--ease-out) 650ms, transform 900ms var(--ease-out) 650ms;
+}
+
+.footer.is-armed .footer__letter {
+  opacity: 0;
+  transform: translateY(55%);
+  transition:
+    opacity 1200ms var(--ease-out) calc(350ms + var(--l) * 90ms),
+    transform 1400ms var(--ease-out) calc(350ms + var(--l) * 90ms),
+    --near 400ms var(--ease-out);
+}
+
+.footer.is-armed.is-in .footer__word,
+.footer.is-armed.is-in .footer__cta-support,
+.footer.is-armed.is-in .footer__cta-contact {
+  opacity: 1;
+  transform: none;
+}
+
+.footer.is-armed.is-in .footer__letter {
+  opacity: 1;
+  transform: translateY(calc(var(--near) * -0.05em));
+}
+
+/* Risen: the letters answer the pointer without the entrance's delays. */
+.footer.is-armed.is-settled .footer__letter {
+  transition: transform 500ms var(--ease-out), --near 400ms var(--ease-out);
+}
+
+/* Under reduced motion the letters still warm, but do not lift. */
+@media (prefers-reduced-motion: reduce) {
+  .footer__letter { transform: none; }
+}
