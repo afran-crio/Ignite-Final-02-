@@ -48,6 +48,14 @@
   animation: hero-push-in 3000ms cubic-bezier(0.45, 0, 0.25, 1) both;
 }
 
+/* Held at its start while the intro plays (index.html sets `is-loading`
+   on <html>), so the push-in — and the shimmer timed from it — begin as the
+   intro dissolves rather than unseen beneath it. */
+html.is-loading .hero__media img,
+html.is-loading .hero__headline-accent.shimmer {
+  animation-play-state: paused;
+}
+
 @keyframes hero-push-in {
   from { transform: none; }
   to { transform: scale(1.06); }
