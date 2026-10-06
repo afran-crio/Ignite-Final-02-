@@ -56,6 +56,10 @@ export default function Testimonials() {
   /* Scroll between quotes: a sideways swipe or drag, or a sideways
      trackpad scroll, moves to the next or previous one. Up-and-down
      scrolling is left to the page. */
+  /* A quote that changes under the pointer (a bar or a swipe) no longer
+     holds it: the new one must be pointed at again. */
+  useEffect(() => setHovered(false), [active]);
+
   const go = (step: number) => setActive((i) => (i + step + items.length) % items.length);
   const drag = useRef<{ x: number; y: number } | null>(null);
   const wheelLock = useRef(0);
@@ -91,11 +95,8 @@ export default function Testimonials() {
             aria-label={testimonials.heading}
             ref={rootRef}
             style={{ '--interval': `${INTERVAL}ms` } as React.CSSProperties}
-            /* Pointer events, not mouse events: a tap on a phone also fires
-               mouseenter, which would hold the rotation after the finger
-               lifts. Focus holds only when it's from the keyboard. */
-            onPointerEnter={(e) => e.pointerType === 'mouse' && setHovered(true)}
-            onPointerLeave={(e) => e.pointerType === 'mouse' && setHovered(false)}
+            /* Focus holds only when it's from the keyboard. (The mouse
+               holds it only over the quote itself: see the blockquote.) */
             onFocusCapture={(e) => setFocused(e.target.matches(':focus-visible'))}
             onBlurCapture={() => setFocused(false)}
           >
@@ -120,7 +121,18 @@ export default function Testimonials() {
                 >
                   {/* Word by word, so each can rise into place in turn; the
                       whole quote is read out once, from the label. */}
-                  <blockquote className="testimonials__quote" aria-label={item.quote}>
+                  {/* A resting mouse holds the rotation only over the words
+                      being read, not the whole card, so a pointer left in
+                      the middle of the screen doesn't stop it (Oct 2026).
+                      Pointer events, not mouse events: a tap on a phone also
+                      fires mouseenter, which would hold it after the finger
+                      lifts. */}
+                  <blockquote
+                    className="testimonials__quote"
+                    aria-label={item.quote}
+                    onPointerEnter={(e) => e.pointerType === 'mouse' && setHovered(true)}
+                    onPointerLeave={(e) => e.pointerType === 'mouse' && setHovered(false)}
+                  >
                     {item.quote.split(' ').map((word, w) => (
                       <span
                         key={w}

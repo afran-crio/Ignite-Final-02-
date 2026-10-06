@@ -97,6 +97,56 @@ export default function Works() {
     };
   }, []);
 
+  /* Touch screens have no hover, so there the tile in view is the open one
+     (Oct 2026): as the reader swipes, the card that comes to rest opens —
+     the photograph pushes in, the glow rises, the description lifts the
+     figure — and the one it replaces closes, the same movement a pointer
+     gives on desktop. Starts once the cards have glided in. */
+  const touch = useRef(false);
+  useEffect(() => {
+    if (!embla || !carouselRef.current) return;
+    touch.current = window.matchMedia('(hover: none)').matches;
+    if (!touch.current) return;
+    const root = embla.rootNode();
+    const inView = () => {
+      const view = root.getBoundingClientRect();
+      let best = 0;
+      let most = -1;
+      embla.slideNodes().forEach((slide, i) => {
+        const r = slide.getBoundingClientRect();
+        const seen = Math.min(r.right, view.right) - Math.max(r.left, view.left);
+        if (seen > most + 1) {
+          most = seen;
+          best = i;
+        }
+      });
+      return best;
+    };
+    let started = false;
+    const follow = () => {
+      if (started) setActive(inView());
+    };
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting) || started) return;
+        observer.disconnect();
+        window.setTimeout(() => {
+          started = true;
+          follow();
+        }, 1100);
+      },
+      { threshold: 0.35 },
+    );
+    observer.observe(carouselRef.current);
+    embla.on('select', follow);
+    embla.on('settle', follow);
+    return () => {
+      observer.disconnect();
+      embla.off('select', follow);
+      embla.off('settle', follow);
+    };
+  }, [embla]);
+
   /* Pointer takes precedence over the intro: hovering any tile ends it. */
   const choose = (i: number | null) => {
     introOpen.current = false;
@@ -142,7 +192,7 @@ export default function Works() {
             >
               {/* The slides are groups of the carousel (not list items), as
                   the carousel pattern has them. */}
-              <div className="works__track" onMouseLeave={() => choose(null)}>
+              <div className="works__track" onMouseLeave={() => !touch.current && choose(null)}>
                 {works.transactions.map((t, i) => (
                   <div
                     className="works__slide"
@@ -170,7 +220,7 @@ export default function Works() {
                           .slideRegistry.findIndex((group) => group.includes(i));
                         if (snap >= 0) embla.scrollTo(snap);
                       }}
-                      onBlur={() => choose(null)}
+                      onBlur={() => !touch.current && choose(null)}
                       onClick={() => choose(i)}
                     >
                       {/* The accent that rises from the foot of the tile under

@@ -381,13 +381,6 @@
   .works__description { font-size: var(--fs-body); }
 }
 
-/* Touch has no hover to open a tile, so there every tile is shown open:
-   full colour, the glow up, the description in. */
-@media (hover: none) {
-  .works__glow { transform: none; }
-  .works__solution { color: #fff; }
-  .works__detail {
-    grid-template-rows: 1fr;
-    opacity: 1;
-  }
-}
+/* Touch has no hover: the tile in view is opened by Works.tsx as the
+   reader swipes, so the cards move as they do under a pointer (Oct 2026;
+   every tile used to be shown open and still). */
