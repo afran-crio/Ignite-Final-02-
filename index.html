@@ -28,20 +28,47 @@
       })();
     </script>
     <script>
-      /* The intro (see #ldr below): once per visit, so moving between pages
-         or reloading doesn't make the reader wait again. Decided here, before
-         first paint, so the page never flashes before it. Visitors who ask
-         for reduced motion get a short fade rather than the sequence.
-         `?intro` in the address replays it regardless, for review. */
+      /* The intro (see #ldr below): in full once per visit; on every load
+         after that, only its columns, rising as shutters onto the page
+         (`is-loading-short`, ~1.8s), so the reader isn't held again. Decided
+         here, before first paint, so the page never flashes before it.
+         Visitors who ask for reduced motion get a short fade the first time
+         and nothing after. `?intro` in the address replays it in full. */
       (function () {
         var d = document.documentElement;
         var force = /[?&]intro\b/.test(location.search);
+        var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         try {
-          if (sessionStorage.getItem('ignite-intro') && !force) return;
+          if (sessionStorage.getItem('ignite-intro') && !force) {
+            if (reduced) return;
+            d.classList.add('is-loading', 'is-loading-short');
+            /* Its column pictures, fetched first so they're up before the
+               shutters move. */
+            for (var i = 1; i <= 5; i++) {
+              var l = document.createElement('link');
+              l.rel = 'preload';
+              l.as = 'image';
+              l.href = '/media/intro/col-' + i + '.webp';
+              document.head.appendChild(l);
+            }
+            return;
+          }
           sessionStorage.setItem('ignite-intro', '1');
         } catch (e) {}
         d.classList.add('is-loading');
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) d.classList.add('is-loading-quick');
+        if (reduced) {
+          d.classList.add('is-loading-quick');
+          return;
+        }
+        /* The column pictures, which fill in with the count (see
+           .ldr__pic): asked for at once. */
+        for (var j = 1; j <= 5; j++) {
+          var k = document.createElement('link');
+          k.rel = 'preload';
+          k.as = 'image';
+          k.href = '/media/intro/col-' + j + '.webp';
+          document.head.appendChild(k);
+        }
       })();
     </script>
     <style>
@@ -51,7 +78,9 @@
          from the foot; the back square slides out from behind it; the wordmark
          rises letter by letter from a baseline; a band of warm light crosses it;
          a 000–100 count runs on a hairline at the foot. Then the mark lifts
-         away and the panel opens as rising shutters onto the hero. */
+         away and the columns rise as shutters onto the hero (~5.1s in all).
+         Behind the mark, each column fills from the foot with a photograph
+         in step with the count, so the columns are the progress. */
       #ldr {
         --ink: #0f1317;
         --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -76,9 +105,12 @@
         position: relative;
         flex: 1;
         margin-right: -1px; /* no seams */
+        overflow: hidden; /* clips its picture as that travels */
         background: var(--ink);
         transition: transform 900ms var(--ease-io);
-        transition-delay: calc(200ms + var(--c) * 50ms);
+        /* When it rises, once the mark has begun to lift. */
+        --rise: 250ms;
+        transition-delay: calc(var(--rise) + var(--c) * 50ms);
       }
       .ldr__col::after {
         content: '';
@@ -217,6 +249,62 @@
       html.is-loading-quick .ldr__col::after { transform: scaleY(1); }
       html.is-loading-quick .ldr__s1-line { stroke-dashoffset: 0; }
       html.is-loading-quick .ldr__sheen { display: none; }
+
+      /* The column pictures: a photograph from the transactions in each
+         column, in the site's steel monochrome (public/media/intro, graded
+         in the file). On the full intro each fills its column from the foot
+         as the count runs, dimmed under the mark, and rises with its
+         shutter. On a return load they show from the start, the columns
+         alone, their hairlines drawn quickly. */
+      html.is-loading-short .ldr__stage,
+      html.is-loading-short .ldr__foot { display: none; }
+      .ldr__pic {
+        position: absolute;
+        inset: 0;
+        bottom: -16%; /* room to travel */
+        background: center / cover no-repeat;
+        /* Filled from the foot as the count runs (--f, 0–1, set by the
+           script below): each column a progress bar. The 86.2% is the part
+           of the picture inside its column (the rest is room to travel). */
+        clip-path: inset(calc((1 - var(--f, 0)) * 86.2%) 0 0 0);
+        transition: transform 1000ms var(--ease-io) calc(var(--rise) + var(--c) * 50ms);
+      }
+      /* As its column rises, the picture slides up within it too, a little
+         ahead of the shutter. */
+      html.is-leaving .ldr__pic { transform: translateY(-14%); }
+      html.is-loading-quick .ldr__pic { display: none; }
+      html.is-loading-short .ldr__pic {
+        clip-path: none;
+        animation: ldr-fade 450ms ease-out calc(40ms + var(--c) * 50ms) backwards;
+      }
+      /* Held darker while the mark is over them, so it reads; lifting as the
+         mark goes. */
+      .ldr__pic::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background: rgba(15, 19, 23, 0.5);
+        transition: opacity 600ms ease;
+      }
+      html.is-leaving .ldr__pic::before,
+      html.is-loading-short .ldr__pic::before { opacity: 0; }
+      .ldr__pic::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(15, 19, 23, 0.3), rgba(15, 19, 23, 0.55));
+      }
+      .ldr__col:nth-child(1) .ldr__pic { background-image: url('/media/intro/col-1.webp'); }
+      .ldr__col:nth-child(2) .ldr__pic { background-image: url('/media/intro/col-2.webp'); }
+      .ldr__col:nth-child(3) .ldr__pic { background-image: url('/media/intro/col-3.webp'); }
+      .ldr__col:nth-child(4) .ldr__pic { background-image: url('/media/intro/col-4.webp'); }
+      .ldr__col:nth-child(5) .ldr__pic { background-image: url('/media/intro/col-5.webp'); }
+      html.is-loading-short .ldr__col::after {
+        animation-duration: 600ms;
+        animation-delay: calc(var(--c) * 60ms);
+      }
+      html.is-loading-short .ldr__col { --rise: 0ms; }
       html.is-loading-quick.is-leaving .ldr__col { transform: none; opacity: 0; transition: opacity 400ms ease; }
       html.is-loading-quick.is-leaving .ldr__stage { transform: none; }
     </style>
@@ -224,7 +312,7 @@
   <body>
     <div id="ldr" aria-hidden="true">
       <div class="ldr__cols">
-        <div class="ldr__col" style="--c:0"></div><div class="ldr__col" style="--c:1"></div><div class="ldr__col" style="--c:2"></div><div class="ldr__col" style="--c:3"></div><div class="ldr__col" style="--c:4"></div>
+        <div class="ldr__col" style="--c:0"><div class="ldr__pic"></div></div><div class="ldr__col" style="--c:1"><div class="ldr__pic"></div></div><div class="ldr__col" style="--c:2"><div class="ldr__pic"></div></div><div class="ldr__col" style="--c:3"><div class="ldr__pic"></div></div><div class="ldr__col" style="--c:4"><div class="ldr__pic"></div></div>
       </div>
       <div class="ldr__grain"></div>
       <div class="ldr__stage">
@@ -277,16 +365,24 @@
         var el = document.getElementById('ldr');
         if (!d.classList.contains('is-loading')) { el.parentNode.removeChild(el); return; }
         var quick = d.classList.contains('is-loading-quick');
-        var HOLD = quick ? 700 : 3700;   /* until it starts to leave */
-        var OUT = quick ? 400 : 1300;    /* shutters: 200ms + 900ms + 4 x 50ms stagger */
+        var short = d.classList.contains('is-loading-short');
+        /* Until it starts to leave, and the leaving (shutters: their delay,
+           900ms each, 4 x 50ms stagger). */
+        var HOLD = quick ? 700 : short ? 650 : 3700;
+        var OUT = quick ? 400 : short ? 1150 : 1450;
         var count = el.querySelector('.ldr__count');
         var bar = el.querySelector('.ldr__bar');
         var t0 = performance.now(), done = false, frame;
         function ease(p) { return p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2; }
+        var pics = el.querySelectorAll('.ldr__pic');
         function show(p) {
           var e = ease(p);
           count.textContent = String(Math.round(e * 100)).padStart(3, '0');
           bar.style.setProperty('--p', e);
+          /* The columns fill left to right, overlapping, all full at 100. */
+          for (var c = 0; c < pics.length; c++) {
+            pics[c].style.setProperty('--f', Math.min(1, Math.max(0, (e - c * 0.1) / 0.6)));
+          }
         }
         function tick(now) {
           var p = Math.min(1, Math.max(0, (now - t0 - 400) / (HOLD - 500)));
@@ -301,7 +397,7 @@
           d.classList.add('is-leaving');
           d.classList.remove('is-loading');
           setTimeout(function () {
-            d.classList.remove('is-leaving', 'is-loading-quick');
+            d.classList.remove('is-leaving', 'is-loading-quick', 'is-loading-short');
             if (el.parentNode) el.parentNode.removeChild(el);
           }, OUT);
         }
