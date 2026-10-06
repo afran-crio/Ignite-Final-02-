@@ -62,11 +62,14 @@ export const clientele = {
   heading: 'Marquee Clientele',
   lead: 'Trusted by market leaders across sectors.',
   /**
-   * 17 approved clients, dealt alternately onto the two rails (see
+   * 16 approved clients, dealt alternately onto the two rails (see
    * Clientele.tsx) — the order alternates compact marks with wide wordmarks
    * so each rail carries a mix.
    *
-   * `logo` is a file in public/clients/.
+   * `logo` is a file in public/clients/: the client's artwork (Oct 2026),
+   * trimmed to its edges, and where it came white-on-dark (ESL, Pristine,
+   * Shrem, and the names under the Ashwin Sheth and J Kumar marks) its
+   * white set in ink for the light band. KP is its mark alone.
    *
    * `ratio` is the logo file's width ÷ height; the rail sizes each mark
    * from it, so wide wordmarks and square marks carry a similar visual
@@ -75,22 +78,21 @@ export const clientele = {
    * (KP) is set a little smaller, a light one (Taj's thin gold) larger.
    */
   clients: [
-    { name: 'Hiranandani', logo: '/clients/hiranandani.png', ratio: 1.09, scale: 0.99 },
-    { name: 'ESL, Vedanta Group', logo: '/clients/esl-vedanta.png', ratio: 6.64, scale: 1.03 },
+    { name: 'Hiranandani', logo: '/clients/hiranandani.png', ratio: 1.10, scale: 1.08 },
+    { name: 'ESL, Vedanta Group', logo: '/clients/esl-vedanta.png', ratio: 6.64, scale: 1.0 },
     { name: 'NDR InvIT', logo: '/clients/ndr-invit.png', ratio: 2.22, scale: 0.97 },
-    { name: 'BKT', logo: '/clients/bkt.png', ratio: 2.87, scale: 0.86 },
     { name: 'Hyfun Foods', logo: '/clients/hyfun-foods.png', ratio: 1.91, scale: 1.09 },
-    { name: 'One Source, Strides Pharma Group', logo: '/clients/one-source.svg', ratio: 9.58, scale: 0.68 },
-    { name: 'KP Group', logo: '/clients/kp-group.png', ratio: 0.90, scale: 0.96 },
-    { name: 'Gayatrishakti Paper', logo: '/clients/gayatrishakti-paper.png', ratio: 3.24, scale: 0.93 },
-    { name: 'Taj Aravalli', logo: '/clients/taj.svg', ratio: 1.15, scale: 1.32 },
-    { name: 'Sanathan Textiles', logo: '/clients/sanathan-textiles.png', ratio: 5.43, scale: 1.02 },
-    { name: 'J Kumar', logo: '/clients/j-kumar.png', ratio: 0.71, scale: 1.08 },
-    { name: 'Ashwin Sheth Group', logo: '/clients/ashwin-sheth.png', ratio: 4.04, scale: 0.96 },
-    { name: 'SLMG', logo: '/clients/slmg.png', ratio: 2.32, scale: 1.11 },
-    { name: 'MediBuddy', logo: '/clients/medibuddy.svg', ratio: 3.91, scale: 1.16 },
-    { name: 'Pristine Logistics', logo: '/clients/pristine-logistics.png', ratio: 2.21, scale: 1.05 },
-    { name: 'Shrem InvIT', logo: '/clients/shrem-invit.png', ratio: 2.63, scale: 1.04 },
+    { name: 'One Source, Strides Pharma Group', logo: '/clients/one-source.png', ratio: 9.41, scale: 0.7 },
+    { name: 'KP Group', logo: '/clients/kp-group.png', ratio: 0.92, scale: 1.06 },
+    { name: 'Gayatrishakti Paper', logo: '/clients/gayatrishakti-paper.png', ratio: 3.23, scale: 1.05 },
+    { name: 'Taj Aravalli', logo: '/clients/taj-aravali.png', ratio: 2.52, scale: 1.35 },
+    { name: 'Sanathan Textiles', logo: '/clients/sanathan-textiles.png', ratio: 5.33, scale: 1.02 },
+    { name: 'J Kumar', logo: '/clients/j-kumar.png', ratio: 0.70, scale: 1.15 },
+    { name: 'Ashwin Sheth Group', logo: '/clients/ashwin-sheth.png', ratio: 1.61, scale: 1.25 },
+    { name: 'SLMG', logo: '/clients/slmg.png', ratio: 2.31, scale: 1.11 },
+    { name: 'MediBuddy', logo: '/clients/medibuddy.png', ratio: 4.81, scale: 1.0 },
+    { name: 'Pristine Logistics', logo: '/clients/pristine-logistics.png', ratio: 1.52, scale: 1.0 },
+    { name: 'Shrem InvIT', logo: '/clients/shrem-invit.png', ratio: 2.65, scale: 1.04 },
     { name: 'NDR Warehousing', logo: '/clients/ndr-warehousing.png', ratio: 1.44, scale: 0.9 },
   ],
 } as const;
