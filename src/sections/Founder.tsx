@@ -31,6 +31,14 @@ const SOFT = 5;
 
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
 
+/** The body's words, the last two held together by a no-break space so
+    the quotation never ends on a word alone (Oct 2026). */
+function bodyWords(text: string) {
+  const words = text.split(' ');
+  if (words.length > 1) words.splice(-2, 2, `${words[words.length - 2]}\u00A0${words[words.length - 1]}`);
+  return words;
+}
+
 export default function Founder() {
   const bodyRef = useRef<HTMLSpanElement>(null);
 
@@ -98,7 +106,7 @@ export default function Founder() {
             <p>
               <span className="founder__lead">{founder.quoteLead}</span>{' '}
               <span className="founder__rest" ref={bodyRef}>
-                {founder.quoteBody.split(' ').map((word, i) => (
+                {bodyWords(founder.quoteBody).map((word, i) => (
                   <span key={i} className="founder__word">
                     {i > 0 && ' '}
                     {word}

@@ -9,10 +9,11 @@
    space on every side.
    ========================================================================== */
 
-/* A band of its own, given a little more room than a section usually
-   takes at either end, so the quotation sits in clear space. */
+/* A band of its own, held compact so the quotation reads as a pause
+   between sections rather than a section of its own (Oct 2026; it took
+   1.2x the section space, then 0.8x). */
 .founder {
-  padding-block: calc(var(--section-space) * 1.2);
+  padding-block: calc(var(--section-space) * 0.7);
   background: var(--c-beige);
 }
 
@@ -94,14 +95,18 @@
 
 @media (min-width: 1024px) {
   .founder__mark {
-    margin-bottom: calc(var(--spacing) * 36);
-    font-size: calc(var(--spacing) * 96);
+    margin-bottom: calc(var(--spacing) * 26);
+    font-size: calc(var(--spacing) * 80);
   }
 
+  /* Held to a pull-quote measure (~70 characters a line) rather than the
+     full grid, so it reads as a compact centred block (Oct 2026). */
   .founder__quote {
-    font-size: calc(var(--spacing) * 32);
-    line-height: 1.4;
+    max-width: 34em;
+    margin-inline: auto;
+    font-size: calc(var(--spacing) * 27);
+    line-height: 1.45;
   }
 
-  .founder__attribution { margin-top: calc(var(--spacing) * 44); }
+  .founder__attribution { margin-top: calc(var(--spacing) * 34); }
 }

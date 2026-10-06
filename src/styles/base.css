@@ -344,6 +344,33 @@ ul, ol { list-style: none; }
     transform var(--transition-fast) var(--ease);
 }
 
+/* At least 44px to press, on every screen (Oct 2026). */
+.btn { min-height: 44px; }
+
+/* ----------------------------------------------------------- touch targets
+   Small text links and controls keep their look and their place, but are
+   given a 44px area to press: an invisible layer centred on each, at least
+   44px each way. */
+.nav__link,
+.nav__brand,
+.footer__link,
+.footer__cta-mail,
+.testimonials__bar { position: relative; }
+
+.nav__link::after,
+.nav__brand::after,
+.footer__link::after,
+.footer__cta-mail::after,
+.testimonials__bar::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100%, 44px);
+  height: max(100%, 44px);
+  translate: -50% -50%;
+}
+
 .btn:hover {
   background: var(--c-orange);
   color: #fff;

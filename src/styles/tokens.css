@@ -83,10 +83,13 @@
   --fs-h3: calc(var(--spacing) * 21);
   --fs-metric: calc(var(--spacing) * 64);
   --fs-metric-sm: calc(var(--spacing) * 34);
-  --fs-lead: calc(var(--spacing) * 17);
-  --fs-body: calc(var(--spacing) * 15.5);
-  --fs-small: calc(var(--spacing) * 13.5);
-  --fs-mono: calc(var(--spacing) * 11);
+  /* Floors (Oct 2026): the fluid root runs small on the narrowest phones and
+     on laptops, which took body text under 16px and the mono labels to
+     ~10px; these hold reading sizes there and leave the larger ones be. */
+  --fs-lead: max(17px, calc(var(--spacing) * 17));
+  --fs-body: max(16px, calc(var(--spacing) * 15.5));
+  --fs-small: max(13.5px, calc(var(--spacing) * 13.5));
+  --fs-mono: max(12px, calc(var(--spacing) * 11));
 
   --lh-display: 0.98;
   --lh-heading: 1.06;
@@ -116,7 +119,8 @@
      longer alternate grounds, so the gap between them is the only thing
      separating one from the next: enough to breathe, not enough to read as a
      break in the page. */
-  --section-space: calc(var(--spacing) * 72);
+  /* Fluid, within a range, so whitespace holds on the smallest phones. */
+  --section-space: clamp(64px, calc(var(--spacing) * 78), 90px);
   --section-space-tight: calc(var(--spacing) * 40);
   /* Supporting copy: the line under a section headline, one level down. */
   --fs-support: var(--fs-lead);
@@ -222,6 +226,7 @@ html {
     /* The longer hero line, "Empowering Growth.", is ~9.4em: held to the
        grid so it sets on one line. */
     --fs-hero: min(calc(var(--spacing) * 80), calc(var(--grid-width) * 0.95 / 9.6));
+    --section-space: clamp(80px, calc(var(--spacing) * 88), 120px);
   }
 }
 
@@ -243,15 +248,17 @@ html {
     --fs-h3: calc(var(--spacing) * 22);
     --fs-metric: calc(var(--spacing) * 96);
     --fs-metric-sm: calc(var(--spacing) * 52);
-    --fs-lead: calc(var(--spacing) * 19);
-    --fs-body: calc(var(--spacing) * 16.5);
-    --fs-small: calc(var(--spacing) * 14);
-    --fs-mono: calc(var(--spacing) * 11.5);
+    /* Floored, as above: the desktop root is at its smallest on laptops
+       (1024–1366), where body text had fallen to ~15px. */
+    --fs-lead: max(18px, calc(var(--spacing) * 19));
+    --fs-body: max(17px, calc(var(--spacing) * 16.5));
+    --fs-small: max(14px, calc(var(--spacing) * 14));
+    --fs-mono: max(12px, calc(var(--spacing) * 11.5));
 
     --nav-height: calc(var(--spacing) * 92);
-    --section-space: calc(var(--spacing) * 96);
+    --section-space: clamp(110px, calc(var(--spacing) * 116), 160px);
     --section-space-tight: calc(var(--spacing) * 56);
-    --fs-support: calc(var(--spacing) * 18);
+    --fs-support: max(17.5px, calc(var(--spacing) * 18));
     --block-space: calc(var(--spacing) * 24);
     --title-space: calc(var(--spacing) * 44);
     --eyebrow-space: calc(var(--spacing) * 20);

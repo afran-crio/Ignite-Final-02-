@@ -191,8 +191,8 @@
   display: grid;
   place-content: center;
   gap: calc(var(--spacing) * 5);
-  width: calc(var(--spacing) * 44);
-  height: calc(var(--spacing) * 44);
+  width: max(44px, calc(var(--spacing) * 44));
+  height: max(44px, calc(var(--spacing) * 44));
   margin-right: calc(var(--spacing) * -10);
 }
 

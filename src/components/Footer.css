@@ -141,6 +141,12 @@
 
 .footer__nav-heading { margin-bottom: calc(var(--spacing) * 5); }
 
+/* On touch screens the links are spaced so each has ~44px to press
+   (Oct 2026); with a mouse they keep their tighter stack. */
+@media (pointer: coarse) {
+  .footer__nav { gap: max(20px, calc(var(--spacing) * 20)); }
+}
+
 .footer__link {
   font-size: var(--fs-small);
   color: var(--c-on-dark-soft);

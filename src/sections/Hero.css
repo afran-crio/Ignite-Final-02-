@@ -37,9 +37,11 @@
   /* Held from the top and enlarged, so the foreshore and trees at the foot
      of the photograph fall out of the frame and the bridge fills more of it
      (Oct 2026). `scale` rather than transform, so it composes with the
-     push-in on load. */
-  object-position: 50% 0;
-  transform-origin: 50% 0;
+     push-in on load. Anchored towards the right, where the bridge's towers
+     stand (82–93% across the photograph), so the enlargement and the
+     push-in crop the skyline on the left rather than cutting the bridge. */
+  object-position: 90% 0;
+  transform-origin: 90% 0;
   scale: 1.18;
   /* On load the photograph slowly pushes in for three seconds and holds
      there, so the hero arrives with a little movement (Oct 2026; it used
@@ -54,6 +56,16 @@
 html.is-loading .hero__media img,
 html.is-loading .hero__headline-accent.shimmer {
   animation-play-state: paused;
+}
+
+/* A phone, or any screen held upright (a portrait tablet), shows a narrow
+   slice of the photograph: held to its right edge, so both towers and the
+   deck's far end stay in it. */
+@media (max-width: 767px), (max-aspect-ratio: 1/1) {
+  .hero__media img {
+    object-position: 100% 0;
+    transform-origin: 100% 0;
+  }
 }
 
 @keyframes hero-push-in {

@@ -111,14 +111,17 @@ export default function Team() {
     if (!grid || !intro || !('ResizeObserver' in window)) return;
     const wide = window.matchMedia('(min-width: 1280px)');
     const fit = () => {
-      const third = grid.children[6] as HTMLElement | undefined;
+      /* The third row's portrait itself, not its card: the card has
+         padding, and the heading should land level with the photograph. */
+      const third = grid.children[6]?.querySelector<HTMLElement>('.team__member-photo') ?? undefined;
       const text = intro.firstElementChild as HTMLElement | null;
       if (!wide.matches || !third || !text) {
         intro.style.height = '';
         return;
       }
       /* The intro stops when its foot meets the wrapper's, so the wrapper
-         ends one intro-height below the third row's top. */
+         ends one intro-height below the third row's portrait: it comes to
+         rest level with Krishnendu's and Nikhil's photographs. */
       /* Layout positions (offsetTop), not on-screen ones: a card that has
          not yet revealed is drawn lower by its entrance transform. */
       const pageTop = (el: HTMLElement) => {

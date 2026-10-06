@@ -21,6 +21,10 @@
 .stats-bold .countup__affix { color: inherit; }
 
 /* ------------------------------------------------------------ the panel */
+/* Its short support line breaks into even lines, never ending on a word
+   alone (Oct 2026). */
+.stats-bold__lead p { text-wrap: balance; }
+
 .stats-bold__lead {
   container-type: inline-size;
   position: relative;
@@ -183,5 +187,5 @@
 @media (min-width: 1280px) {
   .stats-bold__body { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); }
   .stats-bold__tile { padding: calc(var(--spacing) * 16); }
-  .stats-bold__item-label { font-size: calc(var(--spacing) * 13); }
+  .stats-bold__item-label { font-size: max(12.5px, calc(var(--spacing) * 13)); }
 }
