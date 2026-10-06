@@ -4,28 +4,20 @@ import Reveal from '../components/Reveal';
 import './Expertise.css';
 
 /**
- * Six capabilities as expanding panels. On desktop they stand side by side:
- * closed, a panel shows its number with its title running up the side; the
- * open one widens to four times the others, turns to the dark ground with
- * the accent glow rising through it, and shows its title and description.
- * Below desktop the panels stack as rows and the open one expands downward.
+ * Six capabilities in About's block format: on the left the dark panel with
+ * the accent glow rising through it — as the $2 Bn panel is — showing one
+ * capability's title and description; on the right all six as grey tiles,
+ * two by three, the chosen one set on white in an accent ring that traces
+ * round it as it is chosen (Oct 2026). A tile is chosen by clicking or
+ * tapping it (or Enter / Space from the keyboard) and stays chosen until
+ * another is: the pointer passing over the grid does not move the choice.
  *
- * One panel is always open — the first on arrival — and the pointer, focus
- * or a tap opens another. When the panels arrive, a soft band of light
- * rises once through the closed ones in a left-to-right wave, as a cue that
- * each can be opened.
- * Each panel's header is a real button with `aria-expanded`, so the set
- * works as an accordion from the keyboard and for assistive technology.
+ * The tiles are toggle buttons for the panel, which is announced politely
+ * as it changes.
  */
 export default function Expertise() {
-  const [open, setOpen] = useState(0);
-  /* Once the reader has opened a panel, the arrival sweep has done its job;
-     `is-settled` stops it replaying on a panel that closes again. */
-  const [settled, setSettled] = useState(false);
-  const choose = (i: number) => {
-    setOpen(i);
-    if (i !== open) setSettled(true);
-  };
+  const [active, setActive] = useState(0);
+  const cap = expertise.capabilities[active];
 
   return (
     <section className="section section--deep expertise" id="expertise">
@@ -42,45 +34,29 @@ export default function Expertise() {
           <p className="support expertise__lead">{expertise.lead}</p>
         </Reveal>
 
-        <Reveal delay={180}>
-          <ul className={`expertise__panels${settled ? ' is-settled' : ''}`}>
-            {expertise.capabilities.map((cap, i) => {
-              const isOpen = i === open;
-              const detailId = `expertise-detail-${cap.number}`;
-              return (
-                <li
-                  key={cap.number}
-                  className={`expertise__panel${isOpen ? ' is-open' : ''}`}
-                  style={{ '--i': i } as React.CSSProperties}
-                  onMouseEnter={() => choose(i)}
-                >
-                  <h3 className="expertise__heading">
-                    <button
-                      type="button"
-                      className="expertise__trigger"
-                      aria-expanded={isOpen}
-                      aria-controls={detailId}
-                      onClick={() => choose(i)}
-                      onFocus={() => choose(i)}
-                    >
-                      <span className="expertise__number">{cap.number}</span>
-                      <span className="expertise__spine">{cap.title}</span>
-                    </button>
-                  </h3>
+        <Reveal delay={180} className="expertise__body-grid">
+          <div className="expertise__panel" id="expertise-panel" aria-live="polite">
+            {/* Keyed on the capability, so each arrives with a fade. */}
+            <div className="expertise__panel-text" key={cap.number}>
+              <h3 className="expertise__panel-title">{cap.title}</h3>
+              <p className="expertise__panel-body">{cap.description}</p>
+            </div>
+          </div>
 
-                  <div className="expertise__detail" id={detailId}>
-                    <div className="expertise__detail-inner">
-                      {/* The title again, set across the open panel on
-                          desktop; the heading above already names it. */}
-                      <p className="expertise__title" aria-hidden="true">
-                        {cap.title}
-                      </p>
-                      <p className="expertise__body">{cap.description}</p>
-                    </div>
-                  </div>
-                </li>
-              );
-            })}
+          <ul className="expertise__tiles">
+            {expertise.capabilities.map((c, i) => (
+              <li key={c.number}>
+                <button
+                  type="button"
+                  className={`expertise__tile${i === active ? ' is-active' : ''}`}
+                  aria-pressed={i === active}
+                  aria-controls="expertise-panel"
+                  onClick={() => setActive(i)}
+                >
+                  {c.title}
+                </button>
+              </li>
+            ))}
           </ul>
         </Reveal>
       </div>

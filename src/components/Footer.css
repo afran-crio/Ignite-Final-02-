@@ -2,13 +2,32 @@
    type and the accent kept for the logo, the underlines and the wordmark. */
 .footer {
   --c-on-dark: #ffffff;
-  --c-on-dark-soft: rgba(255, 255, 255, 0.85);
-  --c-on-dark-mute: rgba(255, 255, 255, 0.5);
-  --c-line-dark: rgba(255, 255, 255, 0.12);
+  /* The navigation links in grey, white under the pointer (client
+     feedback, Oct 2026). */
+  --c-on-dark-soft: rgba(255, 255, 255, 0.6);
+  /* The small copy — the supporting line, the address, the column labels
+     and the copyright — raised again, from 68%, for contrast on the dark
+     ground (client feedback, Sep and Oct 2026). */
+  --c-on-dark-mute: rgba(255, 255, 255, 0.82);
+  /* The divider under the headline row: a lighter graphite, so it reads
+     as a line rather than a near-black seam (client feedback, Oct 2026). */
+  --c-line-dark: rgba(255, 255, 255, 0.32);
 
   padding-block: calc(var(--spacing) * 40) calc(var(--spacing) * 24);
   background: var(--c-dark);
   color: var(--c-on-dark);
+}
+
+/* The footer keeps the full-width grid (a 44px margin at 1440) while the
+   page above is inset (tokens.css): it spans the screen as the closing
+   band. The tokens are re-declared here so its .wrap, its columns and the
+   wordmark sized from them all take the wider grid. */
+@media (min-width: 1024px) {
+  .footer {
+    --margin: calc(3.05556vw - var(--sbw) * 0.0305556);
+    --column: calc(6.55093vw - var(--sbw) * 0.0655093);
+    --grid-width: calc(93.8889vw - var(--sbw) * 0.938889);
+  }
 }
 
 /* ------------------------------------------------------------------- CTA
@@ -25,19 +44,20 @@
 }
 
 .footer__cta-heading {
-  font-size: calc(var(--fs-h2) * 1.12);
+  font-size: var(--fs-h2);
   font-weight: var(--fw-regular);
   line-height: 1.1;
   letter-spacing: -0.02em;
   color: var(--c-on-dark);
 }
 
+/* "about your next stage of growth." — grey against the white "Let's talk". */
 .footer__cta-rest { color: rgba(255, 255, 255, 0.4); }
 
 .footer__cta-support {
   max-width: 34em;
   margin-top: calc(var(--spacing) * 12);
-  font-size: var(--fs-small);
+  font-size: var(--fs-body);
   line-height: 1.6;
   color: var(--c-on-dark-mute);
 }
@@ -65,57 +85,23 @@
 
 .footer__cta-mail:hover { text-decoration-color: var(--c-orange); }
 
-/* The response note, which gives way to "Email copied" for a moment when
-   a click copies the address: both in one cell, cross-fading. */
+/* "Email copied", shown for a moment beneath the address when a click
+   copies it. It keeps its line when hidden, so the row never shifts. */
 .footer__cta-note {
-  display: grid;
   margin-top: calc(var(--spacing) * 4);
-  font-size: var(--fs-small);
+  font-size: var(--fs-mono);
+  font-weight: var(--fw-medium);
   line-height: 1.5;
-  color: var(--c-on-dark-mute);
-}
-
-.footer__cta-note > span {
-  grid-area: 1 / 1;
+  letter-spacing: var(--ls-mono);
+  text-transform: uppercase;
+  color: var(--c-orange);
+  opacity: 0;
   transition: opacity 250ms var(--ease-out);
 }
 
-.footer__cta-note .footer__copied-text {
-  font-size: var(--fs-mono);
-  font-weight: var(--fw-medium);
-  letter-spacing: var(--ls-mono);
-  text-transform: uppercase;
-  align-self: center;
-  color: var(--c-orange);
-  opacity: 0;
-}
-
-.footer__cta-note.is-copied > span:first-child { opacity: 0; }
-.footer__cta-note.is-copied .footer__copied-text { opacity: 1; }
+.footer__cta-note.is-copied { opacity: 1; }
 
 .footer__link { position: relative; }
-
-/* The note shown for a moment beside the Contact column's Email entry
-   when a click copies the address. */
-.footer__copied {
-  position: absolute;
-  top: 50%;
-  left: 100%;
-  margin-left: calc(var(--spacing) * 10);
-  font-size: var(--fs-mono);
-  font-weight: var(--fw-medium);
-  letter-spacing: var(--ls-mono);
-  line-height: 1;
-  text-transform: uppercase;
-  white-space: nowrap;
-  color: var(--c-orange);
-  opacity: 0;
-  translate: 0 -50%;
-  transition: opacity 250ms var(--ease-out);
-  pointer-events: none;
-}
-
-.footer__copied.is-shown { opacity: 1; }
 
 .footer__cta-mail:focus-visible,
 .footer__link:focus-visible {
@@ -172,6 +158,31 @@
   text-decoration-color: var(--c-orange);
 }
 
+/* LinkedIn, with its mark ahead of the label; the underline stays under
+   the word. */
+.footer__link--icon {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 7);
+  text-decoration: none;
+}
+
+.footer__link--icon .footer__link-label {
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 2px;
+  text-underline-offset: calc(var(--spacing) * 5);
+  transition: text-decoration-color var(--transition-fast) var(--ease);
+}
+
+.footer__link--icon:hover .footer__link-label { text-decoration-color: var(--c-orange); }
+
+.footer__icon {
+  flex-shrink: 0;
+  width: calc(var(--spacing) * 13);
+  height: calc(var(--spacing) * 13);
+}
+
 /* Set as the links beside it so the column reads as one set, but not a
    link yet — no hover and no pointer — because site.linkedinUrl is still
    empty; fill that in and the entry renders as a real .footer__link. */
@@ -199,7 +210,7 @@
 }
 
 @media (min-width: 768px) {
-  .footer__logo { height: calc(var(--spacing) * 88); }
+  .footer__logo { height: calc(var(--spacing) * 72); }
 
   /* Tablets: the logo above, then Navigate, Legal and Contact side by side. */
   .footer__inner {
@@ -224,7 +235,7 @@
 
   .footer__brand { margin-bottom: 0; }
 
-  .footer { padding-top: calc(var(--spacing) * 72); }
+  .footer { padding-top: calc(var(--spacing) * 56); }
 
   /* The headline across the first eight columns; the email on the
      Contact column's line (the last three), level with the headline's
@@ -232,8 +243,8 @@
   .footer__cta {
     grid-template-columns: repeat(12, minmax(0, 1fr));
     align-items: end;
-    margin-bottom: calc(var(--spacing) * 48);
-    padding-bottom: calc(var(--spacing) * 48);
+    margin-bottom: calc(var(--spacing) * 36);
+    padding-bottom: calc(var(--spacing) * 36);
   }
 
   .footer__cta-text { grid-column: 1 / span 8; }

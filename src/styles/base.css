@@ -155,58 +155,6 @@ ul, ol { list-style: none; }
 .section--quiet { padding-block: var(--section-space); }
 
 
-/* -----------------------------------------------------------------------
-   SECTION WASH
-   A soft ambient wash of the accent carries the page from one section into
-   the next. It begins, at nothing, in the lower part of the section before,
-   is at its fullest behind the new section's label and the upper part of its
-   headline, and has faded back to white before the section's content proper
-   begins. One broad radial bloom at ~6% — a warmth in the ground, never a
-   band. The bloom's box reaches above the section and is masked to nothing
-   at both ends, so it never starts or stops on the boundary.
-
-   The box is a fixed height from the top of the section rather than a share
-   of it, so the glow sits at the same height under every heading however
-   tall the section is. Where it sits across the page moves from section to
-   section — `--wash-x` — so the warmth drifts from corner to corner down
-   the page instead of always rising in the same place.
-   ----------------------------------------------------------------------- */
-.section--wash {
-  --wash-x: 44%;
-  /* The bloom's radii and peak, overridable per section. */
-  --wash-w: 64%;
-  --wash-h: 26%;
-  --wash-a: 0.065;
-  position: relative;
-  z-index: 0;
-}
-
-.section--wash-left { --wash-x: 12%; }
-.section--wash-right { --wash-x: 88%; }
-.section--wash-centre { --wash-x: 50%; }
-
-.section--wash::before {
-  content: '';
-  position: absolute;
-  /* Placed so the bloom's peak (48% down its box) lands on the section's
-     label, one section-space below the top edge, whatever that space is. */
-  top: calc(var(--section-space) - var(--spacing) * 336);
-  right: 0;
-  left: 0;
-  height: calc(var(--spacing) * 700);
-  z-index: -1;
-  pointer-events: none;
-  background: radial-gradient(
-    var(--wash-w) var(--wash-h) at var(--wash-x) 48%,
-    rgba(240, 89, 40, var(--wash-a)),
-    transparent 72%
-  );
-  -webkit-mask-image: linear-gradient(
-    to bottom, transparent 0%, #000 28%, #000 56%, transparent 74%);
-  mask-image: linear-gradient(
-    to bottom, transparent 0%, #000 28%, #000 56%, transparent 74%);
-}
-
 /* The page is one continuous ground. These two modifiers are kept because the
    sections still mean something structurally, but neither paints a band any
    more — the flow from section to section is seamless.
@@ -257,7 +205,7 @@ ul, ol { list-style: none; }
 }
 
 @media (min-width: 1024px) {
-  .label { font-size: calc(var(--spacing) * 24); }
+  .label { font-size: calc(var(--spacing) * 17); }
 }
 
 /* Small uppercase label — figures, step markers and the footer column
@@ -403,6 +351,19 @@ ul, ol { list-style: none; }
 
 .btn:active { transform: scale(0.98); }
 
+
+/* The accent button: the hero's one action, in the brand orange so the
+   first screen carries the brand's colour (Oct 2026); white under the
+   pointer. */
+.btn--accent {
+  background: var(--c-orange);
+  color: #fff;
+}
+
+.btn--accent:hover {
+  background: #fff;
+  color: var(--c-ink);
+}
 
 .btn--on-dark {
   background: var(--c-beige);

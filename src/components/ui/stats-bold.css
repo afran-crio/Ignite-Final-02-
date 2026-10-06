@@ -1,28 +1,24 @@
 /* ==========================================================================
-   STATS (BoldStats) — "Experience Demonstrated Through Scale"
+   STATS (BoldStats) — the proof points, inside About
 
-   Label and headline on the shared section pattern, then a bento: $2B on a
-   dark panel — the hero's ink — set large in the accent, with an accent
-   glow rising slowly through it, foot to head, as the About figure's bars
-   do; beside it the supporting figures as tiles on the soft grey, two by
-   two, their suffixes in the accent. On mobile the panel leads and the
-   tiles follow, still two by two.
+   $2B on a dark panel — the hero's ink — set in the accent, with an accent
+   glow rising slowly through it, foot to head; with it the supporting
+   figures as tiles on the soft grey, their suffixes in the accent. Below
+   desktop the panel leads and the tiles follow, two by two. On desktop, in
+   About's right-hand half, the panel and the tiles stand side by side.
+   About places the block and sets the space above it.
    ========================================================================== */
 
 .stats-bold { color: var(--c-ink); }
 
-.stats-bold__eyebrow { margin-bottom: var(--eyebrow-space); }
-
-.stats-bold__heading { color: var(--c-ink); }
-
 .stats-bold__body {
   display: grid;
   gap: var(--gutter);
-  margin-top: var(--title-space);
 }
 
-/* The suffix of every figure ("+", "B") in the accent. */
-.stats-bold .countup__affix { color: var(--c-orange); }
+/* The suffix of the supporting figures ("+") in the figure's own ink;
+   only the lead figure is in the accent (Oct 2026). */
+.stats-bold .countup__affix { color: inherit; }
 
 /* ------------------------------------------------------------ the panel */
 .stats-bold__lead {
@@ -70,10 +66,10 @@
   100% { background-position: 0 -160%; }
 }
 
-/* The one figure allowed to outsize the hero headline: it is set inside a
-   panel, where it reads as an object rather than competing as a line of
-   type, and the panel needs it to fill its space. The size is taken from
-   the panel's own width and capped at 220px.
+/* The lead figure, sized from the panel's own width and capped at 120px —
+   a step under the hero headline, so the hero stays the page's one moment
+   of scale (it was 220px; client feedback, Oct 2026). In About's right
+   half on desktop it is set at 64px (below).
 
    On arrival it climbs through the millions at a little over half size,
    through the tenths of a billion at three quarters, and lands on $2B at
@@ -82,7 +78,7 @@
    panel. The scale is from the baseline's left end, so the figure grows up
    and out from where it sits. */
 .stats-bold__value {
-  font-size: min(calc(var(--spacing) * 220), 44cqi);
+  font-size: min(calc(var(--spacing) * 120), 30cqi);
   font-weight: var(--fw-medium);
   line-height: 0.82;
   letter-spacing: var(--ls-display);
@@ -135,7 +131,7 @@
 }
 
 .stats-bold__item-value {
-  font-size: calc(var(--spacing) * 44);
+  font-size: calc(var(--spacing) * 34);
   font-weight: var(--fw-medium);
   line-height: 0.9;
   letter-spacing: var(--ls-display);
@@ -155,30 +151,37 @@
   }
 }
 
-/* Desktop: the panel in the first six columns, the tiles in the last six;
-   the panel's height is two tiles and the gutter between them. */
+/* Desktop, in About's right half: the panel in the first column, the
+   tiles two by two in the second — the bento, scaled to the half. */
 @media (min-width: 1024px) {
-  .stats-bold__body {
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    column-gap: var(--gutter);
-  }
+  /* Small laptops: the half is too narrow for panel and tiles side by
+     side, so the panel leads and the tiles follow, two by two. */
+  .stats-bold__body { grid-template-columns: minmax(0, 1fr); }
 
   .stats-bold__lead {
-    grid-column: 1 / span 6;
+    gap: calc(var(--spacing) * 20);
     min-height: 0;
+    padding: calc(var(--spacing) * 24);
   }
 
+  .stats-bold__value { font-size: calc(var(--spacing) * 64); }
 
-  .stats-bold__tiles {
-    grid-column: 7 / span 6;
-    grid-auto-rows: 1fr;
-  }
+  .stats-bold__label { font-size: calc(var(--spacing) * 18); }
+
+  .stats-bold__support { font-size: var(--fs-small); }
 
   .stats-bold__tile {
-    min-height: calc(var(--spacing) * 210);
-    padding: var(--card-pad);
+    min-height: calc(var(--spacing) * 130);
+    padding: calc(var(--spacing) * 18);
   }
 
-  .stats-bold__item-value { font-size: calc(var(--spacing) * 80); }
-  .stats-bold__item-label { font-size: var(--fs-body); }
+  .stats-bold__item-value { font-size: calc(var(--spacing) * 30); }
+}
+
+/* From 1280 the panel and tiles stand side by side, the tiles given a
+   little more of the width so their two-line labels have room. */
+@media (min-width: 1280px) {
+  .stats-bold__body { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); }
+  .stats-bold__tile { padding: calc(var(--spacing) * 16); }
+  .stats-bold__item-label { font-size: calc(var(--spacing) * 13); }
 }

@@ -32,25 +32,20 @@ export const hero = {
 
 export const about = {
   heading: 'About Ignite',
-  /* The statement carries the section; the body sits alongside it, set as
-     separate paragraphs rather than one block. */
   statement: 'The capable co-pilot for growth.',
+  /* Shortened from two paragraphs to one sentence, trimmed from the
+     approved first paragraph (client feedback, Oct 2026: "the copy needs
+     shortening aggressively"). Awaiting the client's sign-off. */
   body: [
-    'From understanding the requirement to structuring the solution and navigating execution, we bring the judgement and relationships needed to make complex capital decisions work.',
-    'Anchored in trust, our deep network and commitment to execution allow us to support clients through every stage of their growth journey.',
+    'From structuring the solution to navigating execution, we bring the judgement and relationships that make complex capital decisions work.',
   ],
-  /* The growth figure beside the copy: the stages the body names, in order,
-     rising to growth. Taken from the copy above, not new claims. */
-  stages: ['Requirement', 'Structure', 'Execution', 'Growth'],
 } as const;
 
+/* The proof points, set beside the About statement (see About.tsx) rather
+   than as a section of their own (client feedback, Oct 2026). */
 export const metrics = {
-  /* The short label over the headline, as every section has. New copy —
-     the approved line below is now the headline itself. */
-  label: 'By the Numbers',
-  heading: 'Experience demonstrated through scale.',
   lead: {
-    value: '$2B',
+    value: '$2 Bn',
     label: 'Capital Facilitated',
     support: 'Capital solutions structured across diverse sectors and business requirements.',
   },
@@ -67,16 +62,15 @@ export const clientele = {
   heading: 'Marquee Clientele',
   lead: 'Trusted by market leaders across sectors.',
   /**
-   * 17 approved clients. The order alternates compact marks with wide
-   * wordmarks (ratio ≥ 2.8), which take a double cell in the grid — that is
-   * what lets the grid fill every row exactly at 3, 4 and 6 columns. Keep
-   * the alternation when adding or reordering clients.
+   * 17 approved clients, dealt alternately onto the two rails (see
+   * Clientele.tsx) — the order alternates compact marks with wide wordmarks
+   * so each rail carries a mix.
    *
    * `logo` is a file in public/clients/.
    *
    * `ratio` is the logo file's width ÷ height; the rail sizes each mark
    * from it, so wide wordmarks and square marks carry a similar visual
-   * weight (see Clientele.tsx). Update it when a logo file is replaced.
+   * weight (see lib/logo.ts). Update it when a logo file is replaced.
    * `scale` evens out visual weight on top of that: a heavy solid mark
    * (KP) is set a little smaller, a light one (Taj's thin gold) larger.
    */
@@ -98,23 +92,6 @@ export const clientele = {
     { name: 'Pristine Logistics', logo: '/clients/pristine-logistics.png', ratio: 2.21, scale: 1.05 },
     { name: 'Shrem InvIT', logo: '/clients/shrem-invit.png', ratio: 2.63, scale: 1.04 },
     { name: 'NDR Warehousing', logo: '/clients/ndr-warehousing.png', ratio: 1.44, scale: 0.9 },
-  ],
-  /**
-   * The clients grouped by sector, for the sector index. PROPOSED — these
-   * groupings are Ignite's own claim about its work and need the client's
-   * confirmation. Every name must match a `clients` entry exactly.
-   */
-  sectors: [
-    { name: 'Real estate', clients: ['Hiranandani', 'Ashwin Sheth Group'] },
-    { name: 'Infrastructure & InvITs', clients: ['J Kumar', 'NDR InvIT', 'Shrem InvIT'] },
-    { name: 'Logistics & warehousing', clients: ['NDR Warehousing', 'Pristine Logistics'] },
-    { name: 'Energy', clients: ['KP Group'] },
-    {
-      name: 'Industrials & manufacturing',
-      clients: ['BKT', 'ESL, Vedanta Group', 'Gayatrishakti Paper', 'Sanathan Textiles'],
-    },
-    { name: 'Consumer & hospitality', clients: ['Hyfun Foods', 'SLMG', 'Taj Aravalli'] },
-    { name: 'Healthcare & pharma', clients: ['One Source, Strides Pharma Group', 'MediBuddy'] },
   ],
 } as const;
 
@@ -138,48 +115,55 @@ export const expertise = {
      sentence at the client's request (design review, Sep 2026). */
   headline: 'We structure capital for the moments that define growth.',
   lead: 'From acquisitions and infrastructure to real estate and global capital access, we structure financing around the requirements of each mandate.',
+  /* Descriptions cut to one line each, trimmed from the approved copy, so
+     the panels can be shallower (client feedback, Oct 2026). Awaiting the
+     client's sign-off. */
   capabilities: [
     {
       number: '01',
       title: 'Structured Capital',
       description:
-        'Designing bespoke capital structures for promoter funding, shareholder liquidity, growth capital and special situations.',
+        'Promoter funding, shareholder liquidity, growth capital and special situations.',
     },
     {
       number: '02',
       title: 'Acquisition Financing',
       description:
-        'Supporting domestic and cross-border acquisitions through tailored financing structures and sponsor-backed solutions.',
+        'Domestic and cross-border acquisitions, and sponsor-backed structures.',
     },
     {
       number: '03',
-      title: 'Project & Infrastructure Finance',
+      /* Shortened from "Project & Infrastructure Finance" at the client's
+         request (feedback, Sep 2026). */
+      title: 'Infrastructure Finance',
       description:
-        'Advising on large-ticket financing for infrastructure, manufacturing, logistics and renewable energy projects.',
+        'Large-ticket financing for infrastructure, manufacturing, logistics and renewables.',
     },
     {
       number: '04',
       title: 'Real Estate Financing',
       description:
-        'Supporting developers across land acquisition, last mile financing, refinancing and asset monetisation.',
+        'Land acquisition, last mile financing, refinancing and asset monetisation.',
     },
     {
       number: '05',
       title: 'Sponsor Capital',
       description:
-        'Working alongside promoters and investors on bridge capital, portfolio company growth and leveraged buyouts.',
+        'Bridge capital, portfolio company growth and leveraged buyouts.',
     },
     {
       number: '06',
-      title: 'Global Capital (ECA & DFI)',
+      /* "(ECA & DFI)" dropped at the client's request (feedback, Sep 2026);
+         the description still names both. */
+      title: 'Global Capital',
       description:
-        'Connecting Indian businesses with international lenders, Export Credit Agencies and Development Finance Institutions.',
+        'International lenders, Export Credit Agencies and Development Finance Institutions.',
     },
   ],
 } as const;
 
 export const works = {
-  heading: 'Our Works',
+  heading: 'Our Work',
   /** A sentence with a full stop, like every section's headline. */
   lead: 'Representative transactions.',
   /**
@@ -190,63 +174,66 @@ export const works = {
    * a tinted ground rather than to whatever picture happens to be to hand.
    * Dropping a file into public/media/works/ and naming it here is the only
    * edit needed.
+   *
+   * Ordered by deal value, highest first (client feedback, Sep 2026); where
+   * two are level, the "+" figure leads. Keep that order when adding one.
    */
   transactions: [
     {
-      amount: '$365 million',
+      amount: '$365 Mn',
       description:
         'Single-lender leveraged acquisition financing supporting a landmark cross-border acquisition across seven international jurisdictions.',
-      segment: 'Cross-border acquisition',
-      solution: 'Leveraged buyout',
+      segment: 'Cross-Border Acquisition',
+      solution: 'Leveraged Buyout',
       image: '/media/works/01-cross-border.jpg' as string | null,
     },
     {
-      amount: '$100+ million',
-      description:
-        'Single-lender project financing for a large hybrid renewable energy project based out of Gujarat.',
-      segment: 'Renewable energy',
-      solution: 'Project finance',
-      image: '/media/works/02-renewable.jpg' as string | null,
-    },
-    {
-      amount: '$80 million',
-      description:
-        'Quasi-equity financing supporting the expansion of a leading mid-sized food processing company.',
-      segment: 'Food processing',
-      solution: 'Quasi equity',
-      image: '/media/works/03-food.jpg' as string | null,
-    },
-    {
-      amount: '$250 million',
+      amount: '$250 Mn',
       description:
         'Aggregate debt financing across multiple instruments for a AAA-rated InvIT, supporting successive phases of business growth.',
-      segment: 'Infrastructure & logistics',
-      solution: 'Structured debt',
+      segment: 'Infrastructure & Logistics',
+      solution: 'Structured Debt',
       image: '/media/works/04-logistics.jpg' as string | null,
     },
     {
-      amount: '$200+ million',
+      amount: '$200+ Mn',
       description:
         'Aggregate ECA-backed financing for capital equipment imports across the food processing, pharmaceutical and textile sectors.',
-      segment: 'Capital equipment',
-      solution: 'ECA financing',
+      segment: 'Capital Equipment',
+      solution: 'ECA Financing',
       image: '/media/works/05-equipment.jpg' as string | null,
     },
     {
-      amount: '$50+ million',
+      amount: '$100+ Mn',
+      description:
+        'Single-lender project financing for a large hybrid renewable energy project based out of Gujarat.',
+      segment: 'Renewable Energy',
+      solution: 'Project Finance',
+      image: '/media/works/02-renewable.jpg' as string | null,
+    },
+    {
+      amount: '$100 Mn',
+      description:
+        'Sustainability-linked financing arranged from the International Finance Corporation (IFC) for a listed, AA+ rated automotive related manufacturing company.',
+      segment: 'Automotive Manufacturing',
+      solution: 'ESG Financing',
+      image: '/media/works/07-automotive.jpg' as string | null,
+    },
+    {
+      amount: '$80 Mn',
+      description:
+        'Quasi-equity financing supporting the expansion of a leading mid-sized food processing company.',
+      segment: 'Food Processing',
+      solution: 'Quasi Equity',
+      image: '/media/works/03-food.jpg' as string | null,
+    },
+    {
+      amount: '$50+ Mn',
       description:
         'Structured pre-IPO financing supporting the balance sheet recapitalisation of a leading healthcare platform.',
       segment: 'Healthcare',
-      solution: 'Pre-IPO financing',
+      solution: 'Pre-IPO Financing',
       image: '/media/works/06-healthcare.jpg' as string | null,
-    },
-    {
-      amount: '$100 million',
-      description:
-        'Sustainability-linked financing arranged from the International Finance Corporation (IFC) for a listed, AA+ rated automotive related manufacturing company.',
-      segment: 'Automotive manufacturing',
-      solution: 'ESG financing',
-      image: '/media/works/07-automotive.jpg' as string | null,
     },
   ],
 } as const;
@@ -288,6 +275,13 @@ export const team = {
    * `title` is only populated where a designation has been approved.
    * Do not add titles for the remaining profiles.
    *
+   * `frame` scales the portrait within its card so every head reads at
+   * the same size: the supplied photographs were cropped looser or tighter
+   * (heads from 26% to 33% of the frame), and each is brought up to the
+   * tightest, Amit Malpani's (client feedback, Oct 2026). Only ever 1 or
+   * more — the photographs end at the shoulders, so a smaller portrait
+   * would show the cut. Re-measure when a photograph is replaced.
+   *
    * `linkedin` is the member's public profile, found by web search on
    * 2026-09-20 and to be confirmed by each member before launch; null where
    * no profile could be identified with confidence.
@@ -299,6 +293,7 @@ export const team = {
       title: 'Managing Partner',
       photo: '/team/nikhil-poddar.webp',
       photo2x: '/team/nikhil-poddar@2x.webp',
+      frame: 1.22,
       credentials: [
         'Founded Ignite Advisers in 2009',
         '17+ years of experience in corporate debt advisory and fundraising',
@@ -311,6 +306,7 @@ export const team = {
       title: 'Senior Advisor',
       photo: '/team/vinod-kumar.webp',
       photo2x: '/team/vinod-kumar@2x.webp',
+      frame: 1.14,
       credentials: [
         'Former Chief General Manager, State Bank of India',
         '30+ years of leadership experience in banking',
@@ -323,6 +319,7 @@ export const team = {
       title: null,
       photo: '/team/amit-malpani.webp',
       photo2x: '/team/amit-malpani@2x.webp',
+      frame: 1,
       credentials: [
         'Former ICICI Bank, YES Bank & RBL Bank',
         '15+ years of corporate banking experience',
@@ -335,6 +332,7 @@ export const team = {
       title: null,
       photo: '/team/krutika-maniar.webp',
       photo2x: '/team/krutika-maniar@2x.webp',
+      frame: 1.1,
       credentials: [
         'Former Axis Bank & Kotak Mahindra Bank',
         '15+ years of corporate banking experience',
@@ -347,6 +345,7 @@ export const team = {
       title: null,
       photo: '/team/venkatesh-g.webp',
       photo2x: '/team/venkatesh-g@2x.webp',
+      frame: 1.06,
       credentials: [
         'Former Standard Chartered, Axis Bank & Kotak Mahindra Bank',
         '18+ years of corporate banking experience',
@@ -359,6 +358,7 @@ export const team = {
       title: null,
       photo: '/team/kinjal-shah.webp',
       photo2x: '/team/kinjal-shah@2x.webp',
+      frame: 1.14,
       credentials: [
         'Former Citi, HDFC Bank, RBL Bank & YES Bank',
         '14+ years of corporate banking experience',
@@ -371,6 +371,7 @@ export const team = {
       title: null,
       photo: '/team/krishnendu-biswas.webp',
       photo2x: '/team/krishnendu-biswas@2x.webp',
+      frame: 1.27,
       credentials: [
         'Former EY & Grant Thornton',
         '12+ years of investment banking experience',
@@ -383,6 +384,7 @@ export const team = {
       title: null,
       photo: '/team/nikhil-jethani.webp',
       photo2x: '/team/nikhil-jethani@2x.webp',
+      frame: 1.27,
       credentials: [
         'Chartered Accountant',
         'Former PL Capital & CRISIL',
@@ -393,7 +395,6 @@ export const team = {
 } as const;
 
 export const founder = {
-  eyebrow: "Founder's Perspective",
   /** Approved quotation - never edit. */
   quote:
     'A financing decision is rarely only about price. It is about a structure that works for the business over the long term, and a capital partner who understands its journey. At Ignite, that perspective shapes every mandate. It is the judgement we are engaged for and the trust that brings clients back.',
@@ -409,10 +410,6 @@ export const founder = {
   title: 'Managing Partner',
   photo: '/team/nikhil-poddar.webp',
   photo2x: '/team/nikhil-poddar@2x.webp',
-  /** The rings beside the statement: what a financing decision rests on,
-      in the words of the statement itself — outermost to innermost, trust
-      at the core. */
-  rings: ['Structure', 'Partnership', 'Judgement', 'Trust'],
 } as const;
 
 export const contact = {
@@ -425,11 +422,9 @@ export const contact = {
     'Capital requirements are rarely one-size-fits-all. Speak with our team about the right structure for your business.',
   cta: 'Start a Conversation',
   /** The footer's headline, above the email: the lead in white, the rest
-      in grey. CONFIRM WITH CLIENT (proposed in the design review, Sep 2026). */
-  closing: { lead: 'Let’s talk about', rest: 'your next stage of growth.' },
-  /** Beneath the footer's email. CONFIRM WITH CLIENT: a promise of response
-      time (proposed in the design review, Sep 2026). */
-  response: 'We respond within one business day.',
+      in grey — "Let's talk" white, "about…" grey, as the client asked
+      (feedback, Sep 2026). */
+  closing: { lead: 'Let’s talk', rest: 'about your next stage of growth.' },
   /** Pre-filled subject line on the mail the CTA opens. */
   ctaSubject: 'Start a conversation with Ignite',
 } as const;

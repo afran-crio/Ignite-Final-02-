@@ -7,3 +7,8 @@ dist
 .vercel
 dist-preview
 dist-ssr
+.env*
+
+# design mock-ups and their throwaway scripts (local only)
+screenshots/
+scripts/_tmp-*

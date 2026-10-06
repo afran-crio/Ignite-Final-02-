@@ -1,36 +1,13 @@
 /* ==========================================================================
    EXPERTISE
 
-   Six capabilities as expanding panels (see Expertise.tsx). A very faint
-   accent bloom sits behind the section so the white ground is never flat.
-
-   The bloom extends well past the section and is masked to nothing at both
-   ends, so it never starts or stops on the section boundary — a wash that
-   began at the edge drew a seam there and made the section read as a
-   separate panel.
+   About's block format (see Expertise.tsx): the dark panel with the rising
+   accent glow, showing the chosen capability, beside the six capabilities
+   as grey tiles, two by three. Below desktop the panel leads and the tiles
+   follow, two by three.
    ========================================================================== */
 
-.expertise {
-  position: relative;
-  z-index: 0;
-}
-
-.expertise::before {
-  content: '';
-  position: absolute;
-  inset: calc(var(--spacing) * -168) 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    radial-gradient(52% 40% at 14% 34%, rgba(240, 89, 40, 0.12), transparent 70%),
-    radial-gradient(46% 36% at 86% 72%, rgba(240, 89, 40, 0.08), transparent 70%);
-  -webkit-mask-image: linear-gradient(
-    to bottom, transparent 0%, #000 26%, #000 74%, transparent 100%);
-  mask-image: linear-gradient(
-    to bottom, transparent 0%, #000 26%, #000 74%, transparent 100%);
-}
-
-/* Label → headline → supporting line → grid, on the shared rhythm: the
+/* Label → headline → supporting line → blocks, on the shared rhythm: the
    eyebrow space, the block space, the title space. */
 .expertise__eyebrow { margin-bottom: var(--eyebrow-space); }
 
@@ -44,73 +21,42 @@
 /* The supporting line takes the shared `.support` size and measure. */
 .expertise__lead { margin-inline: 0; }
 
-/* ---------------------------------------------------------------- panels
-   Below desktop: stacked rows. Each row's header is the number and title;
-   the open row's description expands beneath it (a 0fr → 1fr grid row, so
-   the height animates to fit the copy). */
-.expertise__panels {
-  display: flex;
-  flex-direction: column;
-  gap: calc(var(--spacing) * 8);
+.expertise__body-grid {
+  display: grid;
+  gap: var(--gutter);
   margin-top: var(--title-space);
 }
 
+/* ------------------------------------------------------------ the panel */
 .expertise__panel {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  border-radius: var(--radius-card);
-  background: var(--c-beige-deep);
-  color: var(--c-ink);
-  transition:
-    background 500ms var(--ease),
-    color 500ms var(--ease);
-}
-
-.expertise__panel.is-open {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: calc(var(--spacing) * 240);
+  padding: var(--card-pad);
+  border-radius: var(--radius-media);
   background: var(--c-dark);
   color: var(--c-on-dark);
 }
 
-/* Light rising through the panels, foot to head.
-   Closed panels: a straight band of soft accent light the full width of the
-   panel — the sheen on the About bars — once, when the panels scroll into
-   view, staggered left to right: a single wave that says each one can be
-   opened. It does not replay once the reader has opened a panel. (A round
-   glow was tried; squeezed into the narrow panels it read as smudges.)
-   The open panel: the broad accent glow of the $2B panel, repeating. */
+/* The rising glow, as on the $2 Bn panel (stats-bold.css). */
 .expertise__panel::before {
   content: '';
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(
-    to top,
-    transparent 0%,
-    rgba(240, 89, 40, 0.16) 50%,
-    transparent 100%
-  ) no-repeat;
-  background-size: 100% 40%;
-  background-position: 0 200%;
+  background: radial-gradient(70% 50% at 30% 50%, rgba(240, 89, 40, 0.34), transparent 70%) no-repeat;
+  background-size: 100% 90%;
+  background-position: 0 260%;
   pointer-events: none;
 }
 
-.reveal.is-visible .expertise__panels:not(.is-settled) .expertise__panel:not(.is-open)::before {
-  animation: expertise-sweep 2400ms var(--ease) both;
-  animation-delay: calc(500ms + var(--i, 0) * 450ms);
-}
-
-@keyframes expertise-sweep {
-  from { background-position: 0 200%; }
-  to { background-position: 0 -100%; }
-}
-
-.expertise__panels .expertise__panel.is-open::before {
-  background: radial-gradient(70% 50% at 30% 50%, rgba(240, 89, 40, 0.3), transparent 70%) no-repeat;
-  background-size: 100% 90%;
-  background-position: 0 260%;
+.reveal.is-visible .expertise__panel::before {
   animation: expertise-rise 7s var(--ease) infinite;
-  animation-delay: 0ms;
+  animation-delay: 900ms;
 }
 
 @keyframes expertise-rise {
@@ -119,180 +65,129 @@
   100% { background-position: 0 -160%; }
 }
 
-.expertise__heading { font: inherit; }
+.expertise__panel-text { animation: expertise-in 500ms var(--ease-out) both; }
 
-.expertise__trigger {
-  display: flex;
-  align-items: baseline;
-  gap: calc(var(--spacing) * 16);
-  width: 100%;
-  padding: calc(var(--spacing) * 20) var(--card-pad);
-  text-align: left;
-  color: inherit;
+@keyframes expertise-in {
+  from { opacity: 0; transform: translateY(calc(var(--spacing) * 8)); }
+  to { opacity: 1; transform: none; }
 }
 
-.expertise__trigger:focus-visible {
-  outline: 2px solid var(--c-focus);
-  outline-offset: -4px;
-  border-radius: var(--radius-card);
-}
-
-.expertise__number {
-  flex: none;
-  font-size: var(--fs-small);
-  font-weight: var(--fw-semibold);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.02em;
-  color: var(--c-mute);
-  transition: color 500ms var(--ease);
-}
-
-.expertise__panel.is-open .expertise__number { color: var(--c-orange); }
-
-.expertise__spine {
-  font-size: var(--fs-h3);
+.expertise__panel-title {
+  font-size: calc(var(--spacing) * 26);
   font-weight: var(--fw-medium);
   line-height: var(--lh-subhead);
   letter-spacing: var(--ls-heading);
 }
 
-.expertise__detail {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 500ms var(--ease-out);
-}
-
-.expertise__panel.is-open .expertise__detail { grid-template-rows: 1fr; }
-
-.expertise__detail-inner {
-  min-height: 0;
-  overflow: hidden;
-  padding-inline: var(--card-pad);
-}
-
-/* Below desktop the header already carries the title. */
-.expertise__title { display: none; }
-
-.expertise__body {
-  max-width: 34em;
-  padding-bottom: calc(var(--spacing) * 22);
+.expertise__panel-body {
+  max-width: 26em;
+  margin-top: calc(var(--spacing) * 10);
   font-size: var(--fs-body);
   line-height: var(--lh-small);
   color: var(--c-on-dark-soft);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .expertise__panel,
-  .expertise__number,
-  .expertise__detail { transition-duration: 1ms; }
-  .expertise__panel::before { animation: none; }
-  .expertise__panel.is-open::before { background-position: 0 90%; }
+/* ------------------------------------------------------------- the tiles */
+.expertise__tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: 1fr;
+  gap: var(--gutter);
 }
 
-/* Desktop: side by side. Closed panels share the width equally and the open
-   one takes four shares; `flex-grow` animates between them. The open
-   panel's copy is laid out at its final width from the start, so nothing
-   reflows while the panel widens — it is revealed, not re-set. */
+.expertise__tile {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  height: 100%;
+  min-height: calc(var(--spacing) * 72);
+  padding: calc(var(--spacing) * 16) calc(var(--spacing) * 18);
+  border-radius: var(--radius-media);
+  background: var(--c-beige-deep);
+  box-shadow: inset 0 0 0 1.5px transparent;
+  font-size: var(--fs-small);
+  font-weight: var(--fw-medium);
+  line-height: 1.25;
+  letter-spacing: var(--ls-heading);
+  text-align: left;
+  color: var(--c-ink);
+  cursor: pointer;
+  transition:
+    box-shadow 300ms var(--ease),
+    background-color 300ms var(--ease);
+}
+
+/* The chosen tile's outline: a fine accent ring that sweeps round the tile
+   clockwise from the top and closes, and sweeps back as the tile is left
+   (Oct 2026). A ring cut from a conic gradient (the mask keeps only the
+   border), so it takes the tile's own corner radius exactly at any size;
+   the sweep is the gradient's angle, registered below so it can ease. */
+@property --trace {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.expertise__tile::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 1.5px;
+  border-radius: inherit;
+  background: conic-gradient(var(--c-orange) var(--trace), transparent 0);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  pointer-events: none;
+  transition: --trace 900ms cubic-bezier(0.45, 0, 0.25, 1);
+}
+
+/* Carried a touch past the full turn, so no hairline seam is left at the
+   top where the ring's two ends meet. */
+.expertise__tile.is-active::before { --trace: 362deg; }
+
+/* Under the pointer an unchosen tile lightens a little — it can be chosen;
+   the chosen tile is set on white inside its accent ring. */
+@media (hover: hover) {
+  .expertise__tile:not(.is-active):hover { background: #ebebea; }
+}
+
+.expertise__tile.is-active { background: var(--c-paper); }
+
+.expertise__tile:focus-visible {
+  outline: 2px solid var(--c-focus);
+  outline-offset: calc(var(--spacing) * 3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal.is-visible .expertise__panel::before { animation: none; background-position: 0 90%; }
+  .expertise__panel-text { animation: none; }
+  .expertise__tile,
+  .expertise__tile::before { transition-duration: 1ms; }
+}
+
+/* Desktop: the panel in the first six columns, the tiles in the last six. */
 @media (min-width: 1024px) {
-  .expertise__headline {
-    margin-inline: 0;
-    text-wrap: balance;
-  }
+  .expertise__headline { text-wrap: balance; }
 
-  .expertise__lead { margin-inline: 0; }
-
-  .expertise__panels {
-    --open-width: calc((var(--grid-width) - var(--gutter) * 5) * 4 / 9);
-    flex-direction: row;
-    gap: var(--gutter);
-    height: calc(var(--spacing) * 500);
-  }
+  .expertise__body-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
 
   .expertise__panel {
-    flex: 1 1 0;
-    min-width: 0;
-    border-radius: var(--radius-media);
-    cursor: pointer;
-    transition:
-      flex-grow 700ms var(--ease-out),
-      background 500ms var(--ease),
-      color 500ms var(--ease);
+    grid-column: 1 / span 6;
+    min-height: calc(var(--spacing) * 300);
   }
 
-  .expertise__panel.is-open {
-    flex-grow: 4;
-    cursor: default;
-  }
+  .expertise__panel-title { font-size: calc(var(--spacing) * 30); }
 
-  /* The header fills the panel: the number at the head, the title running
-     up the side from the foot. */
-  .expertise__heading {
-    position: absolute;
-    inset: 0;
-  }
+  .expertise__tiles { grid-column: 7 / span 6; }
 
-  .expertise__trigger {
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: space-between;
-    height: 100%;
-    padding: var(--card-pad);
-  }
-
-  .expertise__trigger:focus-visible { border-radius: var(--radius-media); }
-
-  .expertise__number {
-    font-size: calc(var(--spacing) * 40);
-    font-weight: var(--fw-medium);
-    line-height: 0.8;
-    letter-spacing: var(--ls-display);
-  }
-
-  .expertise__spine {
-    writing-mode: vertical-rl;
-    transform: rotate(180deg);
-    white-space: nowrap;
-    transition: opacity 300ms var(--ease);
-  }
-
-  .expertise__panel.is-open .expertise__spine { opacity: 0; }
-
-  /* The open panel's title and description, across its foot. */
-  .expertise__detail {
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    display: block;
-    width: var(--open-width);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 300ms var(--ease);
-  }
-
-  .expertise__panel.is-open .expertise__detail {
-    opacity: 1;
-    transition: opacity 500ms var(--ease) 280ms;
-  }
-
-  .expertise__detail-inner {
-    overflow: visible;
-    padding: var(--card-pad);
-  }
-
-  .expertise__title {
-    display: block;
-    font-size: calc(var(--spacing) * 36);
-    font-weight: var(--fw-medium);
-    line-height: var(--lh-subhead);
-    letter-spacing: var(--ls-heading);
-    color: var(--c-on-dark);
-  }
-
-  .expertise__body {
-    max-width: 26em;
-    margin-top: calc(var(--spacing) * 14);
-    padding-bottom: 0;
-    font-size: var(--fs-lead);
-    line-height: 1.5;
+  .expertise__tile {
+    padding: calc(var(--spacing) * 20);
+    font-size: calc(var(--spacing) * 18);
   }
 }

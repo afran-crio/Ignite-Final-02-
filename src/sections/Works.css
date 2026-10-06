@@ -32,6 +32,7 @@
 .works__title { color: var(--c-on-dark); }
 
 
+
 .works__carousel { margin-top: var(--title-space); }
 
 /* Embla needs this clipped, and the slides sit flush against its top edge —
@@ -133,7 +134,7 @@
   overflow: hidden;
   text-align: left;
   border-radius: var(--radius-media);
-  background-color: #2a2a2a;
+  background-color: #1b2128;
   /* A hairline of light round the edge lifts the tile off the dark ground. */
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
   color: #fff;
@@ -149,9 +150,11 @@
 }
 
 /* ------------------------------------------------------------- photograph
-   Warm monochrome at rest — every tile in one tone, so the rail reads as a
-   set on the dark ground — blooming to full colour and pushing in when the
-   tile opens. */
+   The hero's grade carried through (Oct 2026). The photograph itself is
+   left as it is; the grade is a layer over it — the misty steel blue of the
+   hero photograph, in the colour blend so the picture takes its tone —
+   giving every tile one cool monochrome. The tone holds on hover too —
+   the photograph only pushes in (Oct 2026). */
 .works__photo {
   position: absolute;
   inset: 0;
@@ -160,19 +163,36 @@
   background-size: cover;
   background-position: 50%;
   background-repeat: no-repeat;
-  filter: grayscale(1) sepia(0.18) brightness(0.82) contrast(1.05);
-  transition:
-    transform 1400ms var(--ease-out),
-    filter 900ms var(--ease-out);
+  transition: transform 1400ms var(--ease-out);
 }
 
-.works__tile.is-active .works__photo {
-  transform: scale(1.06);
-  filter: none;
+/* The lighter AVIF/WebP versions, where the browser can choose between
+   them by type (Works.tsx sets --tile-set beside the JPEG). Behind
+   @supports, since a browser that can't read it would otherwise drop the
+   JPEG too. */
+@supports (background-image: image-set(url('a.png') type('image/png'))) {
+  .works__tile.has-image .works__photo {
+    background-image: var(--tile-set, var(--tile-image, none));
+  }
 }
 
-/* The scrim: clear across the upper half so the photograph shows, deep at
-   the foot where the type sits. */
+/* The grade, inside the photograph's own layer so it tones the picture
+   alone. */
+.works__photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #6b7f8a;
+  mix-blend-mode: color;
+}
+
+.works__tile.is-active .works__photo { transform: scale(1.06); }
+
+/* The scrim: deep at the foot and held dark through two-thirds of the
+   tile, so the figure stays readable even when the open description lifts
+   it into the photograph (Oct 2026; it used to clear by halfway, and the
+   type was lost over the lighter photographs). The top of the photograph
+   still shows. */
 .works__tile::before {
   content: '';
   position: absolute;
@@ -180,10 +200,11 @@
   z-index: -2;
   background: linear-gradient(
     to top,
-    rgba(12, 12, 12, 0.92) 0%,
-    rgba(12, 12, 12, 0.6) 30%,
-    rgba(12, 12, 12, 0.08) 62%,
-    rgba(12, 12, 12, 0.22) 100%
+    rgba(17, 21, 26, 0.95) 0%,
+    rgba(17, 21, 26, 0.86) 38%,
+    rgba(17, 21, 26, 0.55) 62%,
+    rgba(17, 21, 26, 0.2) 82%,
+    rgba(17, 21, 26, 0.28) 100%
   );
 }
 
@@ -200,6 +221,10 @@
     rgba(240, 89, 40, 0.1) 44%,
     transparent 58%
   );
+  /* Held back, so the photograph carries the tile and the accent warms its
+     foot without competing with the type (raised from 0.35, Oct 2026, to
+     hold its own over the deeper scrim). */
+  opacity: 0.55;
   transform: translateY(100%);
   transition: transform 700ms var(--ease-out);
 }
@@ -224,6 +249,13 @@
   font-weight: var(--fw-medium);
   line-height: 1.3;
   color: #fff;
+  transition: box-shadow 400ms var(--ease-out);
+}
+
+/* When the tile opens (pointer, focus, a tap or the intro), the tag's
+   hairline turns to the accent. */
+.works__tile.is-active .works__industry {
+  box-shadow: inset 0 0 0 1px var(--c-orange);
 }
 
 /* ------------------------------------------------------------------ foot */
@@ -233,7 +265,7 @@
 }
 
 /* The figure's size is the step's size or the size at which the widest
-   figure ("$200+ million", ~4em) fills the tile, whichever is smaller — so
+   figure ("$200+ Mn") fills the tile, whichever is smaller — so
    on narrower laptops, where the tiles are narrower, it never runs off. */
 .works__amount {
   --amount: calc(var(--spacing) * 44);
@@ -246,7 +278,7 @@
   color: #fff;
 }
 
-/* The unit ("million") beside the figure, on its baseline, at under half
+/* The unit ("Mn") beside the figure, on its baseline, at under half
    its size — the figure is the fact, the unit qualifies it. */
 .works__unit {
   font-size: 0.42em;
@@ -254,14 +286,14 @@
   letter-spacing: var(--ls-heading);
 }
 
-/* The deal type, always shown, in the accent. On the open tile the glow
-   sits behind it, so it turns white there to hold its contrast. */
+/* The deal type, always shown, in soft white — the accent is kept for
+   things that act (Oct 2026); full white on the open tile. */
 .works__solution {
   margin-top: calc(var(--spacing) * 12);
   font-size: var(--fs-body);
   font-weight: var(--fw-semibold);
   line-height: 1.3;
-  color: var(--c-orange);
+  color: rgba(255, 255, 255, 0.75);
   transition: color 500ms var(--ease-out);
 }
 
@@ -317,9 +349,7 @@
 }
 
 .works__tile.is-closing .works__photo {
-  transition:
-    transform 1400ms cubic-bezier(0.65, 0, 0.35, 1),
-    filter 1400ms cubic-bezier(0.65, 0, 0.35, 1);
+  transition: transform 1400ms cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 .works__tile.is-closing .works__detail {
@@ -354,71 +384,10 @@
 /* Touch has no hover to open a tile, so there every tile is shown open:
    full colour, the glow up, the description in. */
 @media (hover: none) {
-  .works__photo { filter: none; }
   .works__glow { transform: none; }
   .works__solution { color: #fff; }
   .works__detail {
     grid-template-rows: 1fr;
     opacity: 1;
   }
-}
-
-/* ------------------------------------------------------------ pinned rail
-   Where the page scroll drives the rail (Works.tsx): the section is as tall
-   as the screen plus the rail's travel, and its content holds in place —
-   centred in the screen — while the reader scrolls through it. Each pixel
-   of scroll moves the rail about 1.25px, so the hold stays short. */
-.works.is-pinned {
-  height: calc(100vh + var(--travel, 0px) * 0.8);
-  height: calc(100svh + var(--travel, 0px) * 0.8);
-  padding-block: 0;
-}
-
-.works.is-pinned > .wrap {
-  position: sticky;
-  top: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  height: 100vh;
-  height: 100svh;
-  padding-top: var(--nav-height);
-}
-
-/* The scroll moves it, and so does a sideways drag. */
-.works.is-pinned .works__viewport,
-.works.is-pinned .works__tile { cursor: grab; }
-
-/* Sideways drags come to the rail; up-and-down swipes still scroll the
-   page (which moves the rail too). */
-.works.is-pinned .works__viewport {
-  touch-action: pan-y;
-  user-select: none;
-}
-
-.works.is-pinned .works__track.is-dragging,
-.works.is-pinned .works__track.is-dragging .works__tile { cursor: grabbing; }
-
-.works__track.is-dragging .works__tile { pointer-events: none; }
-
-.works.is-pinned .works__track { will-change: transform; }
-
-/* Kept light while the rail moves: seven frosted tags blurring what moves
-   behind them had the browser repainting every tile each frame. A solid
-   tint reads the same over the photographs; each tile paints on its own. */
-.works.is-pinned .works__industry {
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-  background: rgba(20, 20, 20, 0.45);
-}
-
-.works.is-pinned .works__tile { contain: paint; }
-
-.works__track.is-moving .works__tile { pointer-events: none; }
-
-/* On short windows the held section must fit the screen: the tiles give up
-   height before they would run past its foot. */
-@media (max-height: 760px) {
-  .works.is-pinned .works__tile { min-height: min(calc(var(--spacing) * 440), 50svh); }
-  .works.is-pinned .works__carousel { margin-top: calc(var(--title-space) * 0.6); }
 }

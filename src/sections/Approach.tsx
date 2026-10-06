@@ -52,7 +52,7 @@ export default function Approach() {
   };
 
   return (
-    <section className="section section--panel section--wash approach" id="approach">
+    <section className="section section--panel approach" id="approach">
       <div className="wrap">
         <Reveal as="p" className="label approach__eyebrow">
           {approach.heading}

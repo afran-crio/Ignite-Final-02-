@@ -25,7 +25,7 @@ export const site = {
   linkedinUrl: 'https://www.linkedin.com/company/ignite-advisers-and-consultants/',
   linkedinLabel: 'Ignite Advisers & Consultants',
 
-  address: ['Ignite Advisers & Consultants', '1101 Sapphire Plaza', 'Vile Parle (W), Mumbai'],
+  address: ['Ignite Advisers & Consultants', '1101 Sapphire Plaza', 'Vile Parle (W), Mumbai – 400056'],
 } as const;
 
 /**

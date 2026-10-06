@@ -2,28 +2,28 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { team } from '../content/content';
 import Reveal from '../components/Reveal';
+import LinkedInIcon from '../components/LinkedInIcon';
 import './Team.css';
 
 type Member = (typeof team.members)[number];
 
 /**
- * Leadership first. The members with an approved designation (the Managing
- * Partner and the Senior Advisor) lead the section as feature cards, their
- * credentials in full beside the portrait — nothing to click to learn who
- * leads the firm. The rest of the team follows in a single row of
- * portraits, names beneath; each opens the member's profile in a panel
- * (from the right on larger screens, from the foot of the screen on
+ * The whole team in one grid of portrait cards, one style for everyone —
+ * the members with an approved designation (the Managing Partner and the
+ * Senior Advisor) first, their title in place of the one-line introduction.
+ * Each card turns over to show the full profile; below 1280px, where the
+ * cards are too narrow for it, the profile opens in a panel instead (from
+ * the right on tablets and small laptops, from the foot of the screen on
  * phones), where the arrow keys move through the team.
  *
- * `title` is populated only where a designation has been approved, and it
- * is what places a member among the leaders: profiles without one join the
- * team row rather than inventing a placeholder.
+ * `title` is populated only where a designation has been approved; profiles
+ * without one show the first line of their credentials rather than a
+ * placeholder.
  */
 export default function Team() {
-  const leaders = team.members.filter((m) => m.title);
-  const others = team.members.filter((m) => !m.title);
+  const members = [...team.members].sort((a, b) => Number(!!b.title) - Number(!!a.title));
 
-  /* The member open in the panel (an index into `others`), and whether the
+  /* The member open in the panel (an index into `members`), and whether the
      panel is on its way out (so it can animate before it unmounts). */
   const [open, setOpen] = useState<number | null>(null);
   const [closing, setClosing] = useState(false);
@@ -42,8 +42,8 @@ export default function Team() {
   }, [open, closing]);
 
   const step = useCallback(
-    (by: number) => setOpen((i) => (i === null ? i : (i + by + others.length) % others.length)),
-    [others.length],
+    (by: number) => setOpen((i) => (i === null ? i : (i + by + members.length) % members.length)),
+    [members.length],
   );
 
   /* While open: Escape closes, the arrow keys move through the team, and
@@ -66,14 +66,14 @@ export default function Team() {
   useEffect(() => () => window.clearTimeout(closeTimer.current), []);
 
   /* The team's cards turn over to show the profile on their reverse — one
-     at a time. On phones, where the cards are too small to hold it, the
-     profile opens in the sheet (the panel) instead. */
+     at a time. Below 1280px, where the cards are too narrow to hold it,
+     the profile opens in the panel instead. */
   const [flipped, setFlipped] = useState<number | null>(null);
   const closeButtons = useRef<(HTMLButtonElement | null)[]>([]);
-  const isPhone = () => window.matchMedia('(max-width: 767px)').matches;
+  const isNarrow = () => window.matchMedia('(max-width: 1279px)').matches;
 
   const view = (i: number) => {
-    if (isPhone()) {
+    if (isNarrow()) {
       setOpen(i);
       return;
     }
@@ -95,31 +95,67 @@ export default function Team() {
     return () => window.removeEventListener('keydown', onKey);
   }, [flipped]);
 
-  /* The leaders' entrance: as the cards come into view each portrait,
-     starting over the text, sweeps from right to left into its place and the
-     profile is revealed behind it (see Team.css). The cards are set back
-     (`armed`) only here, so without scripts — or under reduced motion — they
-     simply show. Then the first leader's portrait shows in colour for two
-     seconds and settles to black and white with the rest — a hint that the
-     portraits come into colour. Once. */
-  const leadersRef = useRef<HTMLUListElement>(null);
-  const [armed, setArmed] = useState(false);
-  const [swiped, setSwiped] = useState(false);
+  /* As the cards come into view, the first card lifts and its portrait
+     shows in colour for two seconds, then settles back with the rest — a
+     hint of what the cards do under the pointer. Once. */
+  const gridRef = useRef<HTMLUListElement>(null);
+
+  /* On wide screens the intro is held in view beside the portraits and
+     comes to rest with its top level with the third row's. Its wrapper is
+     sized to end exactly there — from its own top to the third row's top,
+     plus the intro's height — and re-measured whenever the layout moves. */
+  const introRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const grid = gridRef.current;
+    const intro = introRef.current;
+    if (!grid || !intro || !('ResizeObserver' in window)) return;
+    const wide = window.matchMedia('(min-width: 1280px)');
+    const fit = () => {
+      const third = grid.children[6] as HTMLElement | undefined;
+      const text = intro.firstElementChild as HTMLElement | null;
+      if (!wide.matches || !third || !text) {
+        intro.style.height = '';
+        return;
+      }
+      /* The intro stops when its foot meets the wrapper's, so the wrapper
+         ends one intro-height below the third row's top. */
+      /* Layout positions (offsetTop), not on-screen ones: a card that has
+         not yet revealed is drawn lower by its entrance transform. */
+      const pageTop = (el: HTMLElement) => {
+        let y = 0;
+        for (let e: HTMLElement | null = el; e; e = e.offsetParent as HTMLElement | null) y += e.offsetTop;
+        return y;
+      };
+      const rest = pageTop(third) - pageTop(intro);
+      intro.style.height = `${Math.round(rest + text.offsetHeight)}px`;
+    };
+    fit();
+    /* The grid's own size, and the page's (content above settling — fonts,
+       photographs — moves the intro without resizing the grid). */
+    const observer = new ResizeObserver(fit);
+    observer.observe(grid);
+    observer.observe(document.body);
+    wide.addEventListener('change', fit);
+    window.addEventListener('load', fit);
+    return () => {
+      observer.disconnect();
+      wide.removeEventListener('change', fit);
+      window.removeEventListener('load', fit);
+    };
+  }, []);
   const [intro, setIntro] = useState(false);
   useEffect(() => {
-    const list = leadersRef.current;
+    const list = gridRef.current;
     if (!list || !('IntersectionObserver' in window)) return;
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!reduced) setArmed(true);
     const timers: number[] = [];
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) return;
         observer.disconnect();
-        setSwiped(true);
-        /* The colour follows once the portraits have settled (~1.3s): ~0.9s
+        /* The colour follows once the cards have revealed (~0.8s): ~0.9s
            to rise, held in full colour for two seconds, then back down. */
-        const settle = reduced ? 0 : 1300;
+        const settle = reduced ? 0 : 800;
         timers.push(
           window.setTimeout(() => setIntro(true), settle),
           window.setTimeout(() => setIntro(false), settle + 2900),
@@ -134,41 +170,28 @@ export default function Team() {
     };
   }, []);
 
-  const member = open === null ? null : others[open];
+  const member = open === null ? null : members[open];
 
   return (
-    <section className="section section--quiet section--wash section--wash-left team" id="team">
+    <section className="section section--quiet team" id="team">
       <div className="wrap centered centered--release">
         <Reveal as="p" className="label team__eyebrow">
           {team.heading}
         </Reveal>
 
-        <Reveal delay={70}>
-          <h2 className="h2 team__lead measure-title">{team.lead}</h2>
-        </Reveal>
+        {/* A wrapper for the intro: on wide screens it is sized (above) so
+            the intro, held in view inside it, comes to rest level with the
+            third row. */}
+        <div className="team__intro" ref={introRef}>
+          <Reveal delay={70} className="team__intro-text">
+            <h2 className="h2 team__lead measure-title">{team.lead}</h2>
+          </Reveal>
+        </div>
 
         {/* The intro's class sits on the list, not the card: the card's own
             class carries the reveal's `is-visible`, set outside React. */}
-        <ul
-          className={`team__leaders${armed ? ' is-armed' : ''}${swiped ? ' is-swiped' : ''}${intro ? ' is-intro' : ''}`}
-          ref={leadersRef}
-        >
-          {leaders.map((m, i) => (
-            <Reveal as="li" key={m.name} delay={100 + i * 80} className="team__leader">
-              <WashPortrait member={m} className="team__leader-photo" />
-              <div className="team__leader-body">
-                <h3 className="team__name">{m.name}</h3>
-                <p className="mono mono--accent team__title">{m.title}</p>
-                <div className="team__rule" />
-                <Credentials member={m} />
-                <LinkedIn member={m} />
-              </div>
-            </Reveal>
-          ))}
-        </ul>
-
-        <ul className="team__grid">
-          {others.map((m, i) => (
+        <ul className={`team__grid${intro ? ' is-intro' : ''}`} ref={gridRef}>
+          {members.map((m, i) => (
             <Reveal as="li" key={m.name} delay={80 + i * 45} className="team__member">
               <div className={`team__flip${flipped === i ? ' is-flipped' : ''}`}>
                 <div className="team__face team__face--front" inert={flipped === i}>
@@ -185,13 +208,20 @@ export default function Team() {
                   >
                     <span className="team__member-photo">
                       <WashPortrait member={m} />
-                      <span className="team__member-cue" aria-hidden="true">
-                        View profile
-                      </span>
                     </span>
                     <span className="team__member-name">{m.name}</span>
-                    {/* The first line of the profile, as a one-line introduction. */}
-                    <span className="team__member-line">{m.credentials[0]}</span>
+                    {/* The designation where there is one; otherwise the first
+                        line of the profile, as a one-line introduction. */}
+                    {m.title ? (
+                      <span className="team__member-line team__member-line--title">{m.title}</span>
+                    ) : (
+                      <span className="team__member-line">{m.credentials[0]}</span>
+                    )}
+                    {/* The quiet, always-visible invitation; the button's own
+                        label already says it to assistive technology. */}
+                    <span className="team__member-more" aria-hidden="true">
+                      View profile
+                    </span>
                   </button>
                 </div>
 
@@ -225,6 +255,7 @@ export default function Team() {
                     decoding="async"
                   />
                   <h3 className="team__name">{m.name}</h3>
+                  {m.title ? <p className="mono team__back-title">{m.title}</p> : null}
                   <Credentials member={m} />
                   <LinkedIn member={m} />
                 </div>
@@ -256,6 +287,7 @@ export default function Team() {
               <h3 className="team__name team__panel-name" id="team-panel-name">
                 {member.name}
               </h3>
+              {member.title ? <p className="mono mono--accent team__title">{member.title}</p> : null}
               <div className="team__rule" />
               <Credentials member={member} />
               <LinkedIn member={member} />
@@ -288,7 +320,10 @@ function Portrait({ member, className = '', eager = false }: { member: Member; c
  */
 function WashPortrait({ member, className = '' }: { member: Member; className?: string }) {
   return (
-    <span className={`team__wash ${className}`.trim()}>
+    <span
+      className={`team__wash ${className}`.trim()}
+      style={{ '--frame': member.frame } as React.CSSProperties}
+    >
       <Portrait member={member} />
       <img
         className="team__photo team__photo--colour"
@@ -323,7 +358,8 @@ function LinkedIn({ member }: { member: Member }) {
       rel="noreferrer noopener"
       aria-label={`${member.name} on LinkedIn`}
     >
-      LinkedIn
+      <LinkedInIcon className="team__linkedin-icon" />
+      <span className="team__linkedin-label">LinkedIn</span>
     </a>
   );
 }

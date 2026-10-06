@@ -30,3 +30,13 @@
 @media (prefers-reduced-motion: reduce) {
   .shimmer { animation: none; }
 }
+
+/* Windows High Contrast (forced colours) swaps the text colour but can leave
+   the transparent fill, which would make the text vanish: paint it plainly. */
+@media (forced-colors: active) {
+  .shimmer {
+    -webkit-text-fill-color: currentColor;
+    background: none;
+    animation: none;
+  }
+}

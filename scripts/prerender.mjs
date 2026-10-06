@@ -21,7 +21,7 @@ const routes = ['/', '/privacy-policy', '/disclaimer'];
 if (process.env.VITE_PREVIEW) {
   console.log('prerender: skipped for the preview build');
 } else {
-  const { render } = await import(pathToFileURL(path.join(ssr, 'entry-server.js')).href);
+  const { render, titles } = await import(pathToFileURL(path.join(ssr, 'entry-server.js')).href);
   const template = await readFile(path.join(dist, 'index.html'), 'utf8');
   if (!template.includes('<div id="root"></div>')) throw new Error('prerender: #root not found in dist/index.html');
 
@@ -29,10 +29,15 @@ if (process.env.VITE_PREVIEW) {
     /* data-route names the page the HTML is for: main.tsx takes it over only
        where it matches the address (a host falling back to the home page for
        an unknown path must not hand the legal pages the home page's HTML). */
-    const html = template.replace(
+    let html = template.replace(
       '<div id="root"></div>',
       `<div id="root" data-route="${route}">${render(route)}</div>`,
     );
+    /* Each legal page names itself in the tab and in search results. */
+    if (titles[route]) {
+      const escaped = titles[route].replace(/&/g, '&amp;').replace(/</g, '&lt;');
+      html = html.replace(/<title>[\s\S]*?<\/title>/, `<title>${escaped}</title>`);
+    }
     const out = route === '/' ? path.join(dist, 'index.html') : path.join(dist, route.slice(1), 'index.html');
     await mkdir(path.dirname(out), { recursive: true });
     await writeFile(out, html);

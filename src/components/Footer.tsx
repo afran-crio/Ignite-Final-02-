@@ -3,6 +3,7 @@ import PageLink from './PageLink';
 import SectionLink from './SectionLink';
 import { contact, nav } from '../content/content';
 import { site } from '../config/site';
+import LinkedInIcon from './LinkedInIcon';
 import './Footer.css';
 
 const mailto = `mailto:${site.email}?subject=${encodeURIComponent(contact.ctaSubject)}`;
@@ -14,15 +15,15 @@ export default function Footer() {
      address, with a brief "Copied" note — for visitors with no mail app set
      up, where the click would otherwise seem to do nothing. The link is
      left to open as usual. */
-  const [copied, setCopied] = useState<'cta' | 'list' | null>(null);
+  const [copied, setCopied] = useState(false);
   const copyTimer = useRef(0);
-  const copyEmail = (where: 'cta' | 'list') => {
+  const copyEmail = () => {
     navigator.clipboard
       ?.writeText(site.email)
       .then(() => {
-        setCopied(where);
+        setCopied(true);
         window.clearTimeout(copyTimer.current);
-        copyTimer.current = window.setTimeout(() => setCopied(null), 2200);
+        copyTimer.current = window.setTimeout(() => setCopied(false), 2200);
       })
       .catch(() => {});
   };
@@ -133,7 +134,7 @@ export default function Footer() {
       id="contact"
     >
       {/* The invitation: the headline and the line beneath it; beside them
-          the email, labelled, with the response note beneath. */}
+          the email, labelled, with a note beneath it when a click copies it. */}
       <div className="wrap footer__cta">
         <div className="footer__cta-text">
           <h2 className="footer__cta-heading">
@@ -159,14 +160,11 @@ export default function Footer() {
         </div>
         <div className="footer__cta-contact">
           <p className="mono mono--on-dark">Email us</p>
-          <a href={mailto} className="footer__cta-mail" onClick={() => copyEmail('cta')}>
+          <a href={mailto} className="footer__cta-mail" onClick={copyEmail}>
             {site.email}
           </a>
-          <p className={`footer__cta-note${copied === 'cta' ? ' is-copied' : ''}`}>
-            <span>{contact.response}</span>
-            <span className="footer__copied-text" aria-hidden="true">
-              Email copied
-            </span>
+          <p className={`footer__cta-note${copied ? ' is-copied' : ''}`} aria-hidden="true">
+            Email copied
           </p>
         </div>
       </div>
@@ -206,14 +204,8 @@ export default function Footer() {
 
         <div className="footer__nav">
           <p className="mono mono--on-dark footer__nav-heading">Contact</p>
-          {/* Labelled "Email": the address itself is set large in the
-              headline row above. */}
-          <a href={mailto} className="footer__link" onClick={() => copyEmail('list')}>
-            Email
-            <span className={`footer__copied${copied === 'list' ? ' is-shown' : ''}`} aria-hidden="true">
-              Copied
-            </span>
-          </a>
+          {/* No email entry here: the address is set large in the headline
+              row above, and a second one read as a duplicate (Oct 2026). */}
           {/* Labelled "LinkedIn" rather than by the page name, which is the
               company name again and read as a duplicate of the address line
               directly below. Plain text until site.linkedinUrl is filled in —
@@ -221,12 +213,13 @@ export default function Footer() {
           {site.linkedinUrl ? (
             <a
               href={site.linkedinUrl}
-              className="footer__link"
+              className="footer__link footer__link--icon"
               target="_blank"
               rel="noreferrer noopener"
               aria-label={`LinkedIn — ${site.linkedinLabel}`}
             >
-              LinkedIn
+              <LinkedInIcon className="footer__icon" />
+              <span className="footer__link-label">LinkedIn</span>
             </a>
           ) : (
             <span className="footer__muted">LinkedIn</span>

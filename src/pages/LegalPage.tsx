@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import PageLink from '../components/PageLink';
-import { media } from '../config/site';
+import { media, site } from '../config/site';
 import './LegalPage.css';
 
 /**
@@ -31,6 +31,23 @@ function usePrefetchHero() {
   }, []);
 }
 
+/** Names the browser tab after the document, and gives the home page its
+    own title back on leaving (the pre-rendered file carries it too; see
+    scripts/prerender.mjs). */
+export function legalTitle(title: string) {
+  return `${title} | ${site.name}`;
+}
+
+function useDocumentTitle(title: string) {
+  useEffect(() => {
+    const previous = window.document.title;
+    window.document.title = legalTitle(title);
+    return () => {
+      window.document.title = previous;
+    };
+  }, [title]);
+}
+
 /* The documents in legal.ts are `as const`, so their literal types are not
    interchangeable. This is the shape they share. */
 type LegalDocument = {
@@ -42,6 +59,7 @@ type LegalDocument = {
 /** Renders either approved legal document. Copy is verbatim from legal.ts. */
 export default function LegalPage({ document }: { document: LegalDocument }) {
   usePrefetchHero();
+  useDocumentTitle(document.title);
   return (
     <article className="section legal">
       <div className="wrap">

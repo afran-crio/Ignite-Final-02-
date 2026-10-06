@@ -9,9 +9,9 @@ type Props = {
   value: string;
   duration?: number;
   /**
-   * For a figure in billions ("$2B"): count up through the millions first
-   * — $50M, $400M, $900M — turn over into billions at a thousand, and slow
-   * through the tenths ($1.8B, $1.9B) to land on the figure. Counting the 2
+   * For a figure in billions ("$2 Bn"): count up through the millions first
+   * — $50 Mn, $400 Mn, $900 Mn — turn over into billions at a thousand, and
+   * slow through the tenths ($1.8 Bn, $1.9 Bn) to land on the figure. Counting the 2
    * alone would be over in three steps.
    */
   fromMillions?: boolean;
@@ -50,7 +50,7 @@ export default function CountUp({ value, duration = 1800, fromMillions = false }
     if (!match) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     if (!('IntersectionObserver' in window)) return;
-    setText(fromMillions ? `${head}0M` : format(0));
+    setText(fromMillions ? `${head}0 Mn` : format(0));
     if (fromMillions && ref.current) ref.current.dataset.unit = 'M';
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
@@ -67,8 +67,8 @@ export default function CountUp({ value, duration = 1800, fromMillions = false }
       const tick = (now: number) => {
         let t = Math.min((now - start) / duration, 1);
         if (fromMillions) {
-          /* The amount in millions; below a thousand it reads in M, in
-             steps of ten, and from a thousand in B to one decimal. The
+          /* The amount in millions; below a thousand it reads in Mn, in
+             steps of ten, and from a thousand in Bn to one decimal. The
              last frame is the figure exactly as approved. */
           const millions = easeOutSine(t) * target * 1000;
           const billions = (millions / 1000).toFixed(1);
@@ -81,7 +81,7 @@ export default function CountUp({ value, duration = 1800, fromMillions = false }
             node.dataset.unit = 'done';
             t = 1;
           } else if (millions < 1000) {
-            setText(`${head}${Math.min(Math.round(millions / 10) * 10, 990)}M`);
+            setText(`${head}${Math.min(Math.round(millions / 10) * 10, 990)} Mn`);
           }
           else setText(`${head}${billions}${tail}`);
         } else {

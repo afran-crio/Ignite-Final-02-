@@ -1,17 +1,14 @@
 /* ==========================================================================
    TESTIMONIALS — the feature quote
 
-   On the white ground, between the grey panels of the clients and the
-   team: one quote at a time, set large in ink, with an orange quotation
-   mark hanging in the margin and a large faint one closing it. Each quote
-   rises in word by word. The attribution beneath; three bars to switch
-   between quotes. The page scroll drives the quotes where motion is
-   allowed (see the pinned block at the foot).
+   Inside the Marquee Clientele section, beneath the logos: one quote at a
+   time, set large in ink, opened by the solid orange quotation mark the
+   founder's quote uses. Each quote rises in word by word. The attribution beneath; three bars to switch
+   between quotes, the current one filling as the timer runs.
    ========================================================================== */
 
 .testimonials { color: var(--c-ink); }
 
-.testimonials__eyebrow { margin-bottom: var(--eyebrow-space); }
 
 .testimonials__body {
   position: relative;
@@ -19,35 +16,6 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   row-gap: calc(var(--spacing) * 28);
-}
-
-/* The mark: Georgia's classic quotation glyph used as a graphic, as in
-   the founder's section — set very large behind the quote's opening
-   lines, so the quote sits right on it. It is painted in a soft grey
-   gradient clipped to the glyph: strongest at its head, easing away
-   towards its foot, so it sits behind the first words and dissolves
-   before it reaches the rest. */
-.testimonials__mark {
-  position: absolute;
-  top: calc(var(--spacing) * -2);
-  left: calc(var(--spacing) * -14);
-  z-index: -1;
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: calc(var(--spacing) * 300);
-  font-weight: 700;
-  line-height: 0.8;
-  color: transparent;
-  background: linear-gradient(
-    165deg,
-    rgba(20, 20, 20, 0.07) 0%,
-    rgba(20, 20, 20, 0.045) 35%,
-    rgba(20, 20, 20, 0.02) 65%,
-    rgba(20, 20, 20, 0) 92%
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  pointer-events: none;
-  user-select: none;
 }
 
 /* ------------------------------------------------------------------ slides
@@ -112,30 +80,21 @@
   transition-delay: calc(150ms + var(--w) * 28ms);
 }
 
-/* The closing mark: large, faint, in the accent, sitting down into the
-   last line so it frames the quote without adding a line of its own. */
-.testimonials__close {
-  display: inline-block;
-  margin-left: 0.04em;
+/* The opening mark, above the quote: the founder's quotation mark — the
+   system serif's glyph, solid, in the accent — so the page has one
+   quotation style (Oct 2026). */
+.testimonials__quote::before {
+  content: '\201C';
+  display: block;
+  height: 0.45em;
+  margin-bottom: calc(var(--spacing) * 20);
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: 2.1em;
+  font-size: calc(var(--spacing) * 64);
   font-weight: 700;
-  /* A real line box for the gradient to paint into, pulled back out of
-     the line with negative margins so the line keeps its height. */
   line-height: 1;
-  margin-block: -0.5em -0.2em;
-  vertical-align: -0.42em;
-  color: transparent;
-  background: linear-gradient(165deg, #f05928 20%, #ffb825 90%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  opacity: 0;
-  transition: opacity 700ms var(--ease-out);
-}
-
-.testimonials__slide.is-active .testimonials__close {
-  opacity: 0.45;
-  transition-delay: 700ms;
+  /* A lighter shade of the accent: the mark is the section's graphic, not
+     a call to act (Oct 2026). */
+  color: rgba(240, 89, 40, 0.4);
 }
 
 .testimonials__name {
@@ -188,7 +147,8 @@
   animation: testimonials-fill var(--interval, 8000ms) linear both;
 }
 
-/* Held under the pointer or focus, the current bar stands full. */
+/* Held (under the pointer, by keyboard focus, or pressed and held on a
+   phone), the current bar stands full. */
 .testimonials__body.is-held .testimonials__bar.is-current .testimonials__bar-fill {
   animation: none;
   transform: none;
@@ -205,8 +165,8 @@
   border-radius: calc(var(--spacing) * 3);
 }
 
-/* Desktop: the quote and attribution run from the first column, over the
-   mark; the bars close the attribution line at the right. */
+/* Desktop: the quote and attribution run from the first column; the
+   bars close the attribution line at the right. */
 @media (min-width: 1024px) {
   .testimonials__body {
     grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -215,11 +175,26 @@
     align-items: start;
   }
 
-  .testimonials__mark {
-    top: calc(var(--spacing) * 8);
-    left: calc(var(--spacing) * -40);
-    font-size: calc(var(--spacing) * 620);
+  /* The opening mark set large and hung in a column of its own at the
+     left, the quote and attribution beside it — the mark as the panel's
+     graphic (Oct 2026). On the body rather than each quote, so it holds
+     still while the quotes change. */
+  .testimonials__body { padding-left: calc(var(--spacing) * 144); }
+
+  .testimonials__body::before {
+    content: '\201C';
+    position: absolute;
+    left: calc(var(--spacing) * -4);
+    top: calc(var(--spacing) * -10);
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: calc(var(--spacing) * 200);
+    font-weight: 700;
+    line-height: 0.8;
+    color: rgba(240, 89, 40, 0.4);
+    pointer-events: none;
   }
+
+  .testimonials__quote::before { display: none; }
 
   /* Both placed on row 1, so the bars share the slides' cell. */
   .testimonials__slides { grid-column: 1 / span 11; grid-row: 1; }
@@ -228,7 +203,7 @@
 
   .testimonials__quote {
     max-width: 26em;
-    font-size: calc(var(--spacing) * 40);
+    font-size: calc(var(--spacing) * 26);
     line-height: 1.25;
   }
 
@@ -242,40 +217,18 @@
   }
 }
 
-/* ----------------------------------------------------------- pinned mode
-   The section is one screen tall plus a stretch of scroll for each quote,
-   and its content holds in place, centred, while the reader scrolls
-   through them. The bars fill with the scroll instead of a timer. */
-.testimonials.is-pinned {
-  height: calc(100vh + var(--quotes) * var(--step) * 100vh);
-  height: calc(100svh + var(--quotes) * var(--step) * 100svh);
-  padding-block: 0;
-}
-
-.testimonials.is-pinned > .wrap {
-  position: sticky;
-  top: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  height: 100vh;
-  height: 100svh;
-  padding-top: var(--nav-height);
-}
-
-.testimonials.is-pinned .testimonials__bar.is-current .testimonials__bar-fill {
-  animation: none;
-  transform: scaleX(var(--fill, 0));
-}
-
-/* Bars already passed stand full; the section reads as a progress line. */
-.testimonials.is-pinned .testimonials__bar:has(~ .is-current) .testimonials__bar-fill {
-  transform: none;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .testimonials__slide,
-  .testimonials__word,
-  .testimonials__close { transition-duration: 1ms; transition-delay: 0ms; }
+  .testimonials__word { transition-duration: 1ms; transition-delay: 0ms; }
   .testimonials__bar.is-current .testimonials__bar-fill { animation: none; transform: none; }
+}
+
+/* On touch screens a long press holds the quote to read it, so the press
+   must not select its words or raise the system's callout. */
+@media (hover: none) {
+  .testimonials__slides {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
 }

@@ -4,102 +4,114 @@ import Reveal from '../components/Reveal';
 import './Founder.css';
 
 /**
- * The founder's conviction, set as a composition rather than a quote block:
- * the label, then the quotation in two levels — the anchor line large, and
- * the rest as one paragraph running the width beneath it — with a faint
- * oversized quotation mark behind the words, and the attribution beneath
- * with the founder's portrait. The full approved quotation is in
- * content.ts; the two parts read as it, word for word.
+ * The founder's word, following the Leadership Team on a white band of its
+ * own — no label, no portrait, no graphic
+ * (client feedback, Sep and Oct 2026). Set as an epigraph: the opening
+ * quotation mark, the quotation centred and spread wide, its first sentence
+ * a shade firmer, and beneath a short rule with the name and title. The
+ * full approved quotation is in content.ts; the two parts read as it, word
+ * for word.
+ *
+ * The quotation is revealed by the reader's scroll as one sequence (Oct
+ * 2026): the mark fades in as the quotation enters, the body after the first
+ * sentence turns from grey to ink behind a soft edge some five words wide,
+ * and as its last words land the rule draws out and the name and title rise
+ * beneath it. It completes as the quotation's middle reaches the middle of
+ * the screen, where the eye rests. It only moves forward: scrolling back up
+ * leaves what has been revealed in place, and once complete it stays so.
+ * Nothing is hidden for good: without script, or under reduced motion, it
+ * is all shown at once in ink.
  */
+
+/** Grey and ink, as RGB, for the colour each word is mixed between. */
+const GREY = [170, 179, 186];
+const INK = [20, 24, 29];
+/** How many words the edge between ink and grey is spread across. */
+const SOFT = 5;
+
+const clamp = (v: number) => Math.min(1, Math.max(0, v));
+
 export default function Founder() {
-  /* Each ring's line opens at the top around its name: the angle of the
-     opening is measured from the name's width and the ring's radius, and
-     kept up to date as the rings resize. */
-  const ringsRef = useRef<HTMLDivElement>(null);
+  const bodyRef = useRef<HTMLSpanElement>(null);
+
   useEffect(() => {
-    const box = ringsRef.current;
-    if (!box || !('ResizeObserver' in window)) return;
-    const measure = () => {
-      box.querySelectorAll<HTMLElement>('.founder__ring').forEach((ring) => {
-        const name = ring.querySelector<HTMLElement>('.founder__ring-name');
-        const r = ring.offsetWidth / 2;
-        if (!name || !r) return;
-        const half = name.offsetWidth / 2 + 8;
-        const angle = (2 * Math.asin(Math.min(1, half / r)) * 180) / Math.PI;
-        ring.style.setProperty('--gap', `${angle.toFixed(2)}deg`);
+    const body = bodyRef.current;
+    const figure = body?.closest<HTMLElement>('.founder__body');
+    if (!body || !figure || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const words = Array.from(body.querySelectorAll<HTMLElement>('.founder__word'));
+    figure.classList.add('is-scrubbing');
+
+    /* Starts as the body's top passes 92% down the screen; complete when
+       its middle reaches the middle of the screen. */
+    let frame = 0;
+    /* The furthest the reveal has reached; it never goes back. */
+    let reached = 0;
+    const update = () => {
+      frame = 0;
+      const box = body.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const start = vh * 0.92;
+      const end = vh * 0.5;
+      const progress = Math.max(
+        reached,
+        clamp((start - box.top) / (start - end + box.height / 2)),
+      );
+      if (progress === reached && reached > 0) return;
+      reached = progress;
+
+      const front = progress * (words.length + SOFT);
+      words.forEach((word, i) => {
+        const t = clamp((front - i) / SOFT);
+        word.style.color = `rgb(${GREY.map((g, j) => Math.round(g + (INK[j] - g) * t)).join(', ')})`;
       });
+
+      figure.style.setProperty('--mark', String(clamp(progress / 0.18)));
+      figure.style.setProperty('--rule', String(clamp((progress - 0.8) / 0.15)));
+      figure.style.setProperty('--who', String(clamp((progress - 0.92) / 0.08)));
     };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(box);
-    document.fonts?.ready.then(measure);
-    return () => observer.disconnect();
+    const schedule = () => {
+      if (!frame) frame = window.requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+    return () => {
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
+      window.cancelAnimationFrame(frame);
+      figure.classList.remove('is-scrubbing');
+      words.forEach((word) => word.style.removeProperty('color'));
+    };
   }, []);
 
   return (
-    <section className="section section--wash section--wash-right founder" id="founder">
-      <div className="wrap founder__grid">
-        <div className="founder__text">
-        <Reveal as="p" className="label founder__eyebrow">
-          {founder.eyebrow}
-        </Reveal>
-
-        <figure className="founder__body">
+    <section className="section founder" id="founder">
+      <div className="wrap">
+        <Reveal as="figure" className="founder__body">
           <span className="founder__mark" aria-hidden="true">
             “
           </span>
 
           <blockquote className="founder__quote" cite={founder.name}>
-            <Reveal as="p" delay={80} className="founder__lead">
-              {founder.quoteLead}
-            </Reveal>
-
-            <Reveal as="p" delay={160} className="founder__thought">
-              {founder.quoteBody}
-            </Reveal>
+            <p>
+              <span className="founder__lead">{founder.quoteLead}</span>{' '}
+              <span className="founder__rest" ref={bodyRef}>
+                {founder.quoteBody.split(' ').map((word, i) => (
+                  <span key={i} className="founder__word">
+                    {i > 0 && ' '}
+                    {word}
+                  </span>
+                ))}
+              </span>
+            </p>
           </blockquote>
 
-          {/* The attribution. */}
-          <Reveal delay={280} className="founder__foot">
-            <figcaption className="founder__attribution">
-              <img
-                className="founder__photo"
-                src={founder.photo}
-                srcSet={`${founder.photo} 1x, ${founder.photo2x} 2x`}
-                alt={founder.name}
-                loading="lazy"
-                decoding="async"
-              />
-              <div>
-                <p className="founder__name">{founder.name}</p>
-                <p className="mono mono--accent founder__title">{founder.title}</p>
-              </div>
-            </figcaption>
-
-          </Reveal>
-        </figure>
-        </div>
-
-        {/* The statement drawn: four fine rings closing in on the logo's
-            mark — structure, partnership, judgement, and trust at the core.
-            They draw themselves in from the outside when revealed. */}
-        <Reveal delay={200} className="founder__figure">
-          <div className="founder__rings" ref={ringsRef} role="img" aria-label={`At the core: ${founder.rings.join(', ')}`}>
-            {founder.rings.map((ring, i) => (
-              <div
-                key={ring}
-                className="founder__ring"
-                style={{ '--i': i, '--n': founder.rings.length } as React.CSSProperties}
-                aria-hidden="true"
-              >
-                <span className="founder__ring-name">{ring}</span>
-              </div>
-            ))}
-            <span className="founder__core" aria-hidden="true">
-              <span className="founder__core-back" />
-              <span className="founder__core-front" />
-            </span>
-          </div>
+          <figcaption className="founder__attribution">
+            <p className="founder__name">{founder.name}</p>
+            <p className="founder__title">{founder.title}</p>
+          </figcaption>
         </Reveal>
       </div>
     </section>

@@ -1,251 +1,45 @@
 /* ==========================================================================
-   MARQUEE CLIENTELE — the sector index
+   MARQUEE CLIENTELE — two rails of logos, then the testimonials
 
-   On the soft grey panel, after the dark rail of transactions. The headline
-   claims "across sectors"; the index shows it: the sectors with their
-   client counts on the left, a still grid of every client's logo on the
-   right, in soft grey. A logo comes into colour under the pointer; a
-   chosen sector (pointer, focus or tap) brings its clients into colour and
-   eases the rest back, with an orange rule drawn under it.
-
-   On phones the sectors become a row of chips above a three-across grid.
+   The label and headline on the grid, then the clients on two full-bleed
+   rails travelling in opposite directions (LogoCarousel), each fading out
+   at the screen's edges rather than being cut; beneath, the testimonials
+   on an inset panel.
    ========================================================================== */
 
-.clientele__eyebrow { margin-bottom: var(--eyebrow-space); }
+.clientele__eyebrow {
+  margin-bottom: var(--eyebrow-space);
+}
 
-.clientele__lead { color: var(--c-ink); }
+/* Set to sit on a single line, so it holds the full width rather than taking
+   the shared title measure. */
+.clientele__lead {
+  color: var(--c-ink);
+  max-width: none;
+}
 
-.clientele__index {
-  display: grid;
-  gap: calc(var(--spacing) * 28);
+/* The rails run full-bleed so logos can enter and leave past the page
+   margins; LogoCarousel.css masks its own edges. */
+.clientele__rails {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gutter);
   margin-top: var(--title-space);
 }
 
-/* ----------------------------------------------------------------- sectors
-   Phones: a sideways-scrolling row of chips, running past the margins. */
-.clientele__sectors {
-  position: relative;
-  display: flex;
-  gap: calc(var(--spacing) * 8);
-  margin-inline: calc(0px - var(--margin));
-  padding-inline: var(--margin);
-  overflow-x: auto;
-  scrollbar-width: none;
+/* The testimonials beneath the rails, on a panel of their own: an inset
+   grey card within the grid, so the logos and what the clients say read as
+   two parts of one trust section (client feedback, Oct 2026). */
+.clientele__quotes {
+  margin-top: calc(var(--spacing) * 64);
+  padding: calc(var(--spacing) * 28);
+  border-radius: var(--radius-media);
+  background: var(--c-beige-deep);
 }
 
-.clientele__sectors::-webkit-scrollbar { display: none; }
-
-.clientele__sector {
-  position: relative;
-  display: inline-flex;
-  align-items: baseline;
-  gap: calc(var(--spacing) * 8);
-  padding: calc(var(--spacing) * 9) calc(var(--spacing) * 14);
-  border-radius: var(--radius-pill);
-  box-shadow: inset 0 0 0 1px var(--c-line);
-  font-size: var(--fs-small);
-  font-weight: var(--fw-medium);
-  white-space: nowrap;
-  color: var(--c-ink-soft);
-  text-align: left;
-  transition:
-    color 400ms var(--ease-out),
-    background 400ms var(--ease-out),
-    box-shadow 400ms var(--ease-out);
-}
-
-.clientele__sector.is-active {
-  background: var(--c-ink);
-  box-shadow: inset 0 0 0 1px var(--c-ink);
-  color: var(--c-paper);
-}
-
-.clientele__sector-count {
-  font-variant-numeric: tabular-nums;
-  color: var(--c-mute);
-  transition: color 400ms var(--ease-out);
-}
-
-.clientele__sector.is-active .clientele__sector-count { color: var(--c-orange); }
-
-.clientele__sector-rule { display: none; }
-
-.clientele__sector:focus-visible {
-  outline: 2px solid var(--c-focus);
-  outline-offset: calc(var(--spacing) * 3);
-}
-
-/* ------------------------------------------------------------------- logos
-   The cells are sized to the marks: a wide wordmark takes a double cell, a
-   compact mark a single one, so every logo has room in proportion to its
-   shape and none crowds its neighbours. `dense` packing fills every gap
-   while keeping the clients in their mixed order. Each mark is centred in
-   its cell and held inside 82% of its width. */
-.clientele__logos {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-auto-flow: row dense;
-  gap: calc(var(--spacing) * 8) var(--gutter);
-}
-
-.clientele__logo {
-  display: grid;
-  place-items: center;
-  min-width: 0;
-  height: calc(var(--spacing) * 58);
-}
-
-.clientele__logo.is-wide { grid-column: span 2; }
-
-/* Entrance: when the grid is revealed the logos rise into place one after
-   another, from the foot of the grid to its head — the site's rising
-   motif. `backwards` holds each at its start until its turn, then lets
-   go, so the fade of the sector cycle takes over afterwards. */
-.reveal.is-visible .clientele__logo {
-  animation: clientele-rise 800ms var(--ease-out) backwards;
-  animation-delay: calc(200ms + var(--rise, 0) * 60ms);
-}
-
-@keyframes clientele-rise {
-  from {
-    opacity: 0;
-    transform: translateY(calc(var(--spacing) * 28));
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .reveal.is-visible .clientele__logo { animation: none; }
-}
-
-/* Grey at rest: every mark in soft greyscale, so the wall reads as one
-   calm set. A mark comes up into its own colours under the pointer, and a
-   chosen sector brings all of its clients up while the rest ease further
-   back. The filter and opacity sit on the image itself, not the cell: on
-   the cell they would isolate the image from the page and undo the
-   multiply blend that drops the white baked into some of the files. */
-.clientele__logo img {
-  filter: grayscale(1);
-  opacity: 0.6;
-  transition:
-    filter 450ms var(--ease-out),
-    opacity 450ms var(--ease-out);
-}
-
-.clientele__logo:hover img,
-.clientele__logo.is-lit img {
-  filter: none;
-  opacity: 1;
-}
-
-.clientele__logo.is-dim img { opacity: 0.3; }
-
-.clientele__logo img {
-  width: min(calc(var(--spacing) * var(--logo-h) * var(--logo-ratio) * var(--logo-zoom, 0.68)), 82%);
-  height: auto;
-  aspect-ratio: var(--logo-ratio);
-  object-fit: contain;
-  /* Drops the white baked into some of the supplied files. */
-  mix-blend-mode: multiply;
-}
-
-@media (min-width: 768px) {
-  .clientele__logos { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .clientele__logo { height: calc(var(--spacing) * 96); --logo-zoom: 0.85; }
-}
-
-/* Desktop: the sectors as a list in the first four columns, the logos in
-   the last eight. */
 @media (min-width: 1024px) {
-  .clientele__index {
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    column-gap: var(--gutter);
-    align-items: start;
+  .clientele__quotes {
+    margin-top: calc(var(--spacing) * 88);
+    padding: calc(var(--spacing) * 56);
   }
-
-  .clientele__sectors {
-    grid-column: 1 / span 4;
-    flex-direction: column;
-    gap: 0;
-    margin: 0;
-    padding: 0;
-    overflow: visible;
-    border-top: 1px solid var(--c-line);
-  }
-
-  .clientele__sector {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    padding: calc(var(--spacing) * 16) 0;
-    border-radius: 0;
-    box-shadow: none;
-    border-bottom: 1px solid var(--c-line);
-    font-size: var(--fs-h3);
-    letter-spacing: var(--ls-heading);
-    color: var(--c-mute);
-    white-space: normal;
-  }
-
-  .clientele__sector.is-active {
-    background: none;
-    box-shadow: none;
-    color: var(--c-ink);
-  }
-
-  .clientele__sector-count { font-size: var(--fs-body); }
-
-  /* The chosen sector's rule turns orange, drawn in from the left. */
-  .clientele__sector-rule {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -1px;
-    display: block;
-    height: calc(var(--spacing) * 2);
-    background: var(--c-orange);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 450ms var(--ease-out);
-  }
-
-  .clientele__sector.is-active .clientele__sector-rule { transform: none; }
-
-  /* Six across, four full rows, stretched to the sector list so the grid's
-     top and foot sit on the list's first and last rules. Every row keeps
-     the same column lines: compact, wide, compact, wide. */
-  .clientele__index { align-items: stretch; }
-
-  .clientele__logos {
-    grid-column: 5 / span 8;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    grid-template-rows: repeat(4, minmax(0, 1fr));
-    row-gap: 0;
-  }
-
-  .clientele__logo { height: auto; --logo-zoom: 1; }
-
-  /* The last row has two compact marks where the others have a wordmark
-     (Shrem, NDR). They sit as a pair, drawn in to the line between their
-     cells, so the pair centres under the wide column above like the
-     wordmarks do. The two differ in width, so Clientele.tsx measures them
-     and shifts the pair by half the difference (`--pair-shift`). With 17
-     clients these are the last two — revisit this if the list changes. */
-  .clientele__logo:nth-last-child(-n + 2) img { translate: var(--pair-shift, 0px) 0; }
-
-  .clientele__logo:nth-last-child(2) {
-    justify-items: end;
-    padding-right: calc(var(--spacing) * 14);
-  }
-
-  .clientele__logo:nth-last-child(1) {
-    justify-items: start;
-    padding-left: calc(var(--spacing) * 14);
-  }
-}
-
-
-@media (prefers-reduced-motion: reduce) {
-  .clientele__sector,
-  .clientele__logo img { transition-duration: 1ms; }
-  .clientele__sector-rule { transition-duration: 1ms; }
 }

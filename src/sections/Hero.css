@@ -1,13 +1,13 @@
 /* ==========================================================================
    HERO
 
-   Mobile and tablet: a centred stack low in the frame — headline, then the
-   positioning line and the action beneath it.
+   Mobile and tablet: a stack low in the frame on the left grid line, as
+   every section after it is — headline, then the positioning line and the
+   action beneath it.
 
-   Desktop: two columns on the page grid. The headline holds the left grid
-   line (the same line as the logo above it) a fixed distance below the nav;
-   the positioning line and the action form one block on the right, sharing
-   one left edge, level with the lower half of the headline.
+   Desktop: one column on the page's left grid line (the same line as the
+   logo above it), set a fixed distance below the nav — the two-line
+   headline, then the positioning line and the action beneath it.
    ========================================================================== */
 
 .hero {
@@ -34,39 +34,68 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* Slow settle on load, so the hero does not arrive completely static. */
-  animation: hero-settle 1600ms var(--ease-out) both;
+  /* Held from the top and enlarged, so the foreshore and trees at the foot
+     of the photograph fall out of the frame and the bridge fills more of it
+     (Oct 2026). `scale` rather than transform, so it composes with the
+     push-in on load. */
+  object-position: 50% 0;
+  transform-origin: 50% 0;
+  scale: 1.18;
+  /* On load the photograph slowly pushes in for three seconds and holds
+     there, so the hero arrives with a little movement (Oct 2026; it used
+     to settle outward instead). From the top edge, like the framing above,
+     so the bridge grows toward the viewer rather than the sky. */
+  animation: hero-push-in 3000ms cubic-bezier(0.45, 0, 0.25, 1) both;
 }
 
-@keyframes hero-settle {
-  from { transform: scale(1.06); }
-  to { transform: none; }
+@keyframes hero-push-in {
+  from { transform: none; }
+  to { transform: scale(1.06); }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .hero__media img { animation: none; }
 }
 
-/* Legibility scrim. Darkest under the nav and at the foot of the frame,
-   lighter through the middle so the bridge stays clearly visible; the
-   middle band still carries enough weight for the white and orange type
-   that now sits across it. */
+/* Legibility scrim, shaded where the type is rather than veiling the whole
+   photograph (Oct 2026), so the bridge keeps its own colour and depth.
+   Below desktop the type sits low in the frame: clear across the skyline,
+   deepening through the lower part. */
 .hero__scrim {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to bottom,
-    rgba(18, 18, 18, 0.6) 0%,
-    rgba(18, 18, 18, 0.34) 30%,
-    rgba(18, 18, 18, 0.42) 62%,
-    rgba(18, 18, 18, 0.78) 100%
+    rgba(17, 21, 26, 0.5) 0%,
+    rgba(17, 21, 26, 0.05) 25%,
+    rgba(17, 21, 26, 0.2) 50%,
+    rgba(17, 21, 26, 0.88) 78%,
+    rgba(17, 21, 26, 0.95) 100%
   );
+}
+
+/* Desktop: the type is on the left, so the shade runs from the left edge
+   to nothing two-thirds across, over a light band at the head (the nav)
+   and the foot (the scroll cue). */
+@media (min-width: 1024px) {
+  .hero__scrim {
+    background:
+      linear-gradient(90deg,
+        rgba(17, 21, 26, 0.72) 0%,
+        rgba(17, 21, 26, 0.45) 38%,
+        rgba(17, 21, 26, 0.08) 70%,
+        rgba(17, 21, 26, 0) 100%),
+      linear-gradient(to bottom,
+        rgba(17, 21, 26, 0.55) 0%,
+        rgba(17, 21, 26, 0) 22%,
+        rgba(17, 21, 26, 0) 70%,
+        rgba(17, 21, 26, 0.55) 100%);
+  }
 }
 
 .hero__content {
   position: relative;
   z-index: 1;
-  text-align: center;
 }
 
 /* ------------------------------------------------------------- headline */
@@ -76,18 +105,58 @@
   display: flex;
   flex-direction: column;
   font-size: var(--fs-hero);
-  font-weight: var(--fw-medium);
+  /* Regular rather than medium, and tracked a little more open than the
+     display setting, for a calmer, more institutional line (Oct 2026). */
+  font-weight: var(--fw-regular);
   line-height: 0.95;
-  letter-spacing: var(--ls-display);
+  letter-spacing: -0.03em;
 }
 
 .hero__line { display: block; }
 
-/* "Empowering Growth." in the brand orange. ShimmerText paints from
-   currentColor, so setting the colour here is enough. */
+/* Below desktop the headline is set a step under the hero token, so each
+   line breaks once rather than running to four heavy lines. */
+@media (max-width: 1023px) {
+  .hero__headline {
+    font-size: calc(var(--spacing) * 44);
+    line-height: 1;
+  }
+}
+
+/* "Empowering Growth." in a softer white, as the footer sets "about your
+   next stage of growth." against "Let's talk": tonal rather than in the
+   accent (Oct 2026; it was orange). The shimmer is kept: ShimmerText
+   paints from currentColor, so this colour is the base the sweep crosses. */
 .hero__headline-accent {
-  display: block;
-  color: var(--c-orange);
+  color: rgba(255, 255, 255, 0.55);
+  /* The shimmer paints the glyphs with a background clipped to this box, and
+     at 0.95 line-height the descenders of "Empowering Growth." hang below
+     it — so the box is extended down, and the margin gives the space back. */
+  padding-bottom: 0.2em;
+  margin-bottom: -0.2em;
+}
+
+/* The sweep warms through the brand orange rather than a white highlight,
+   and crosses once, on first load, rather than repeating. It begins a
+   second before the image's push-in (3000ms, above) completes, so it picks
+   up as the zoom eases to rest. */
+.hero__headline-accent.shimmer {
+  animation-iteration-count: 1;
+  animation-delay: 2000ms;
+  background-image: linear-gradient(
+    to right,
+    currentColor 0%,
+    #ffb08f 28%,
+    var(--c-orange) 50%,
+    #ffb08f 72%,
+    currentColor 100%
+  );
+}
+
+/* Below desktop the headline crosses the bridge's railing, so the second
+   line is held a little firmer there to stay readable. */
+@media (max-width: 1023px) {
+  .hero__headline-accent { color: rgba(255, 255, 255, 0.72); }
 }
 
 /* ----------------------------------------------------- positioning + CTA */
@@ -97,10 +166,10 @@
 
 .hero__positioning {
   max-width: 30em;
-  margin-inline: auto;
   font-size: var(--fs-lead);
-  line-height: 1.5;
-  color: var(--c-on-dark-soft);
+  line-height: 1.55;
+  /* Near-white rather than the soft 66%, so it holds over the photograph. */
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .hero__cta {
@@ -124,44 +193,33 @@
   /* The composition is set from the top — a fixed step below the nav — so
      the space between the nav and the headline is the same on every screen,
      and the lower part of the frame is left to the bridge. */
+  /* Held a little shorter on short screens (a 768px laptop) so the whole
+     block sits well clear of the frame's foot. */
   .hero {
     justify-content: flex-start;
-    padding-top: calc(var(--nav-height) + var(--spacing) * 64);
+    padding-top: calc(var(--nav-height) + min(var(--spacing) * 150, 16svh));
     padding-bottom: calc(var(--spacing) * 88);
   }
 
-  /* On the page's twelve columns: the headline in the first eight, the
-     paragraph and action starting on column nine — the same line the
-     metrics image and the footer's Legal column start on. */
-  .hero__content {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    column-gap: var(--gutter);
-    align-items: end;
-    text-align: left;
-  }
-
-  /* The size comes from --fs-hero, which holds "Empowering" inside ~58% of
-     the grid. The small negative indent pulls the side-bearing of the first
-     letters back so their ink, not their box, sits on the logo's line. */
+  /* The size comes from --fs-hero, which holds "Empowering Growth." inside
+     ~70% of the grid. The small negative indent pulls the side-bearing of
+     the first letters back so their ink, not their box, sits on the logo's
+     line. */
   .hero__headline {
-    grid-column: 1 / span 8;
+    line-height: 1.08;
     margin-left: -0.045em;
   }
 
-  /* One block: the paragraph ~360px wide, the action directly beneath it on
-     the same left edge. Lifted by one headline line from the foot of the
-     headline, so the block centres on the lower-middle of the composition
-     rather than sitting on its baseline. */
+  /* The paragraph and the action beneath the headline, on its left edge. */
   .hero__aside {
-    grid-column: 9 / span 4;
-    max-width: calc(var(--spacing) * 380);
-    margin: 0 0 calc(var(--fs-hero) * 0.95);
+    max-width: calc(var(--spacing) * 470);
+    margin-top: calc(var(--spacing) * 36);
   }
 
   .hero__positioning {
     max-width: none;
     margin: 0;
+    font-size: calc(var(--spacing) * 20);
   }
 
   .hero__cta { margin-top: calc(var(--spacing) * 30); }

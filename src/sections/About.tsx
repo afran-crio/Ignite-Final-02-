@@ -1,21 +1,20 @@
 import { about } from '../content/content';
 import Reveal from '../components/Reveal';
+import BoldStats from '../components/ui/stats-bold';
 import './About.css';
 
 /**
- * The page's opening statement, on the same pattern as every section after
- * it — label, headline, supporting copy, one left edge — so the page reads
- * as one system from the first section on.
- *
- * Beside the copy on desktop (beneath it on mobile), a growth figure: the
- * stages the copy names, as four bars stepping up in the accent, capped by
- * the logo's two-square mark. It is the logo's own gesture — squares
- * stepping up and to the right — drawn out as the client's journey.
+ * The page's opening statement and the evidence for it: label, headline
+ * and a short line of copy on the left, and in the right-hand half the
+ * proof points — $2B on a dark panel, the four supporting figures two by
+ * two beside it. The figures were a section of their own; folding them in turns
+ * the experience into evidence rather than another section (client
+ * feedback, Oct 2026). Below desktop the figures follow the copy.
  */
 export default function About() {
   return (
-    <section className="section section--panel section--lead section--wash section--wash-left about" id="about">
-      <div className="wrap about__grid">
+    <section className="section section--lead about" id="about">
+      <div className="wrap about__layout">
         <div className="about__text">
           <Reveal as="p" className="label about__label">
             {about.heading}
@@ -34,32 +33,7 @@ export default function About() {
           </div>
         </div>
 
-        <Reveal delay={180} className="about__figure">
-          <ol className="about__steps" aria-label="From requirement to growth">
-            {about.stages.map((stage, i) => (
-              <li
-                key={stage}
-                className="about__step"
-                style={{ '--i': i } as React.CSSProperties}
-              >
-                <span className="about__bar" aria-hidden="true">
-                  {i === about.stages.length - 1 && (
-                    <span className="about__mark">
-                      <span className="about__mark-back" />
-                      <span className="about__mark-front" />
-                    </span>
-                  )}
-                </span>
-                <span className="about__stage">
-                  <span className="mono mono--figure about__stage-number" aria-hidden="true">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                  {stage}
-                </span>
-              </li>
-            ))}
-          </ol>
-        </Reveal>
+        <BoldStats />
       </div>
     </section>
   );

@@ -7,19 +7,17 @@ import CountUp from '../components/CountUp';
 import './Works.css';
 
 /**
- * Transactions as a rail of blocks the reader moves themselves, dragged or
- * swiped. Three and a bit sit on screen at once, so the next one is always
- * visibly waiting rather than hidden.
+ * Transactions as a rail of blocks the reader moves themselves: a
+ * two-finger sideways swipe on a trackpad, a drag, or a swipe on a phone;
+ * from the keyboard, the arrow keys with a tile focused. There are no
+ * arrow buttons (Oct 2026). Three and a bit sit on screen at once, so the next one is
+ * always visibly waiting rather than hidden. The page scroll no longer
+ * drives the rail (client feedback, Sep 2026): the section scrolls past like
+ * any other.
  *
  * The rail does not loop and does not advance on its own: this is a list of
- * record, and the reader should be able to reach the end of it and know that
- * is the end.
- *
- * On desktop the page scroll drives it: the section holds in place while
- * the reader scrolls, the rail glides sideways with the scroll until the
- * last tile has arrived, and then the page carries on — so every visitor
- * passes all seven without having to drag. This runs on every device; only
- * reduced motion keeps the ordinary swipeable rail.
+ * record, ordered by deal value, and the reader should be able to reach the
+ * end of it and know that is the end.
  *
  * A tile at rest shows only the sector and the amount over its photograph.
  * The active tile also shows the mandate's solution and description, risen
@@ -29,188 +27,29 @@ import './Works.css';
  * only under the pointer (or keyboard focus, or when tapped), and none is
  * when the pointer leaves the rail.
  */
-/* The page scroll drives the rail on every device. Only where the reader
-   has asked for reduced motion does the ordinary swipeable carousel run. */
-const PINNED = '(prefers-reduced-motion: no-preference)';
+/**
+ * The tile's photograph, as CSS custom properties: the JPEG as named in
+ * content.ts, and — for a .jpg — the AVIF and WebP made beside it (in
+ * public/media/works/), which browsers that read a typed image-set take
+ * instead, at around half the weight (Oct 2026). See .works__photo.
+ */
+function tileImage(src: string) {
+  const vars: Record<string, string> = { '--tile-image': `url(${src})` };
+  if (/\.jpg$/i.test(src)) {
+    const base = src.replace(/\.jpg$/i, '');
+    vars['--tile-set'] =
+      `image-set(url(${base}.avif) type("image/avif"), url(${base}.webp) type("image/webp"), url(${src}) type("image/jpeg"))`;
+  }
+  return vars;
+}
 
 export default function Works() {
-  /* A sideways swipe on a trackpad (or shift + wheel) moves the rail; an
-     up-and-down scroll still scrolls the page. Switched off where the page
-     scroll drives the rail instead. */
+  /* A two-finger sideways swipe on a trackpad (or shift + wheel) moves the
+     rail; an up-and-down scroll still scrolls the page. */
   const [emblaRef, embla] = useEmblaCarousel(
-    {
-      loop: false,
-      align: 'start',
-      containScroll: 'trimSnaps',
-      breakpoints: { [PINNED]: { active: false } },
-    },
+    { loop: false, align: 'start', containScroll: 'trimSnaps' },
     [WheelGesturesPlugin()],
   );
-
-  const sectionRef = useRef<HTMLElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
-  const [pinned, setPinned] = useState(false);
-  /* How far the rail travels in pinned mode, in px. */
-  const [distance, setDistance] = useState(0);
-
-  useEffect(() => {
-    const mq = window.matchMedia(PINNED);
-    const update = () => setPinned(mq.matches);
-    update();
-    mq.addEventListener('change', update);
-    return () => mq.removeEventListener('change', update);
-  }, []);
-
-  /* Measure the travel: the rail's full width less what the screen shows. */
-  useEffect(() => {
-    const track = trackRef.current;
-    if (!track || !pinned) return;
-    const measure = () => {
-      const view = track.parentElement!;
-      setDistance(Math.max(0, track.scrollWidth - view.clientWidth));
-    };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(track);
-    observer.observe(track.parentElement!);
-    return () => observer.disconnect();
-  }, [pinned]);
-
-  /* Pinned: the page scroll through the held section moves the rail. */
-  useEffect(() => {
-    const section = sectionRef.current;
-    const track = trackRef.current;
-    if (!section || !track) return;
-    if (!pinned) {
-      track.style.transform = '';
-      return;
-    }
-    /* The rail eases towards the scroll position rather than jumping to
-       it: a mouse wheel scrolls in steps of ~100px, and following each step
-       exactly made the rail judder. Each frame closes a share of the gap
-       until it has settled, then the loop stops. */
-    let target = 0;
-    let current: number | null = null;
-    let frame = 0;
-    const tick = () => {
-      if (current === null) current = target;
-      current += (target - current) * 0.16;
-      if (Math.abs(target - current) < 0.3) current = target;
-      track.style.transform = `translate3d(${current.toFixed(2)}px, 0, 0)`;
-      /* While the rail moves the tiles ignore the pointer: a still pointer
-         would otherwise open each tile as it slid beneath it, running the
-         colour and zoom transition on one tile after another. */
-      const moving = current !== target;
-      /* A tile left open under the pointer closes as the rail sets off. */
-      if (moving && !track.classList.contains('is-moving')) setActive(null);
-      track.classList.toggle('is-moving', moving);
-      frame = moving ? requestAnimationFrame(tick) : 0;
-    };
-    const onScroll = () => {
-      const r = section.getBoundingClientRect();
-      const run = r.height - window.innerHeight;
-      const p = run > 0 ? Math.min(1, Math.max(0, -r.top / run)) : 0;
-      target = -p * distance;
-      if (!frame) frame = requestAnimationFrame(tick);
-    };
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
-    };
-  }, [pinned, distance]);
-
-  /* Pinned: the rail can also be dragged sideways (mouse, pen or finger).
-     A drag moves the page scroll by the matching amount, so the rail and
-     the page never disagree; on release the rail carries on a little with
-     the drag's speed. A drag that was mostly vertical is left to the page. */
-  const drag = useRef<{
-    x: number;
-    y: number;
-    scroll: number;
-    ratio: number;
-    axis: 'x' | 'y' | null;
-    lastX: number;
-    lastT: number;
-    v: number;
-  } | null>(null);
-  const dragged = useRef(false);
-
-  const onDragStart = (e: React.PointerEvent) => {
-    if (!pinned || e.button !== 0) return;
-    const section = sectionRef.current;
-    if (!section || distance <= 0) return;
-    const run = section.offsetHeight - window.innerHeight;
-    drag.current = {
-      x: e.clientX,
-      y: e.clientY,
-      scroll: window.scrollY,
-      ratio: run / distance,
-      axis: null,
-      lastX: e.clientX,
-      lastT: performance.now(),
-      v: 0,
-    };
-    dragged.current = false;
-  };
-
-  const onDragMove = (e: React.PointerEvent) => {
-    const d = drag.current;
-    if (!d) return;
-    const dx = e.clientX - d.x;
-    const dy = e.clientY - d.y;
-    if (!d.axis) {
-      if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
-      d.axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
-      if (d.axis === 'y') {
-        drag.current = null;
-        return;
-      }
-      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-      trackRef.current?.classList.add('is-dragging');
-      dragged.current = true;
-    }
-    const now = performance.now();
-    d.v = (e.clientX - d.lastX) / Math.max(1, now - d.lastT);
-    d.lastX = e.clientX;
-    d.lastT = now;
-    window.scrollTo({ top: d.scroll - dx * d.ratio, behavior: 'instant' });
-  };
-
-  const onDragEnd = () => {
-    const d = drag.current;
-    drag.current = null;
-    trackRef.current?.classList.remove('is-dragging');
-    if (!d || d.axis !== 'x') return;
-    /* A short glide in the direction of the throw, at most a third of a
-       tile, so a quick flick carries on a little but never overshoots. */
-    /* No glide if the pointer had come to rest before it let go. */
-    const v = performance.now() - d.lastT > 80 ? 0 : d.v;
-    const glide = Math.max(-140, Math.min(140, -v * 120));
-    if (Math.abs(glide) > 8) {
-      window.scrollTo({ top: window.scrollY + glide * d.ratio, behavior: 'smooth' });
-    }
-  };
-
-  /* Pinned: bring slide i into view by scrolling the page to the point in
-     the held section where the rail shows it, its left edge on the page
-     margin (the first slide carries the margin as its padding). */
-  const showPinned = (i: number) => {
-    const section = sectionRef.current;
-    const track = trackRef.current;
-    if (!section || !track || distance <= 0) return;
-    const slide = track.children[i] as HTMLElement | undefined;
-    if (!slide) return;
-    const tile = slide.querySelector<HTMLElement>('.works__tile')!;
-    const margin = parseFloat(getComputedStyle(track.children[0] as HTMLElement).paddingLeft);
-    const shift = Math.min(distance, Math.max(0, slide.offsetLeft + tile.offsetLeft - margin));
-    const run = section.offsetHeight - window.innerHeight;
-    const top = section.getBoundingClientRect().top + window.scrollY;
-    window.scrollTo({ top: top + (shift / distance) * run, behavior: 'smooth' });
-  };
 
   const [active, setActive] = useState<number | null>(null);
   /* The tile whose intro is descending: it closes slowly, unlike a hover. */
@@ -268,11 +107,9 @@ export default function Works() {
 
   return (
     <section
-      className={`section section--lead section--wash section--wash-right works${pinned ? ' is-pinned' : ''}`}
+      className="section section--lead works"
       id="our-works"
       data-nav-tone="dark"
-      ref={sectionRef}
-      style={pinned ? ({ '--travel': `${distance}px` } as React.CSSProperties) : undefined}
     >
       <div className="wrap centered centered--release">
         <Reveal as="p" className="label works__eyebrow">
@@ -294,34 +131,18 @@ export default function Works() {
             <div
               className="works__viewport"
               ref={emblaRef}
-              onPointerDown={onDragStart}
-              onPointerMove={onDragMove}
-              onPointerUp={onDragEnd}
-              onPointerCancel={onDragEnd}
-              onClickCapture={(e) => {
-                /* A drag is not a click: don't open the tile it ended on. */
-                if (dragged.current) {
-                  e.stopPropagation();
-                  dragged.current = false;
-                }
-              }}
               onKeyDown={(e) => {
                 /* With a tile focused, the arrow keys move the rail. */
                 const step = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
                 if (!step) return;
                 e.preventDefault();
-                if (pinned) {
-                  const tiles = [...(trackRef.current?.querySelectorAll('.works__tile') ?? [])];
-                  const i = tiles.indexOf(document.activeElement as Element);
-                  const next = Math.min(tiles.length - 1, Math.max(0, i + step));
-                  (tiles[next] as HTMLElement | undefined)?.focus({ preventScroll: true });
-                } else if (step > 0) embla?.scrollNext();
+                if (step > 0) embla?.scrollNext();
                 else embla?.scrollPrev();
               }}
             >
               {/* The slides are groups of the carousel (not list items), as
                   the carousel pattern has them. */}
-              <div className="works__track" ref={trackRef} onMouseLeave={() => choose(null)}>
+              <div className="works__track" onMouseLeave={() => choose(null)}>
                 {works.transactions.map((t, i) => (
                   <div
                     className="works__slide"
@@ -333,24 +154,11 @@ export default function Works() {
                   >
                     <div
                       className={`works__tile${t.image ? ' has-image' : ''}${i === active ? ' is-active' : ''}${i === closing ? ' is-closing' : ''}`}
-                      style={
-                        t.image ? ({ '--tile-image': `url(${t.image})` } as React.CSSProperties) : undefined
-                      }
+                      style={t.image ? (tileImage(t.image) as React.CSSProperties) : undefined}
                       tabIndex={0}
                       onMouseEnter={() => choose(i)}
-                      onFocus={(e) => {
+                      onFocus={() => {
                         choose(i);
-                        if (pinned) {
-                          /* Only keyboard focus moves the rail; a pointer
-                             pressing on a tile (to drag, say) leaves it. */
-                          if (!e.currentTarget.matches(':focus-visible')) return;
-                          /* Undo the browser's own scroll of the clipped
-                             rail and scroll the page to the tile instead. */
-                          const view = trackRef.current?.parentElement;
-                          if (view) view.scrollLeft = 0;
-                          showPinned(i);
-                          return;
-                        }
                         /* The browser scrolls a focused tile into view by
                            scrolling the clipped viewport itself, behind the
                            carousel's back; undo that and let the carousel
@@ -382,7 +190,7 @@ export default function Works() {
                           them as it does. */}
                       <div className="works__foot">
                         {/* The figure large and its unit smaller beside it,
-                            on one baseline: "$365" then "million". */}
+                            on one baseline: "$365" then "Mn". */}
                         <p className="works__amount">
                           <CountUp value={t.amount.split(' ')[0]} duration={1600} />
                           {t.amount.includes(' ') && (

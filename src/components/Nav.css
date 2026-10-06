@@ -56,16 +56,17 @@
   flex: none;
 }
 
-/* Over the hero the mark is set ~15–20% larger for presence (client
-   feedback); once the bar contracts into the pill it returns to its original
-   size, so the pill keeps its proportions. The height transitions with the
+/* Over the hero the mark is set well up in size, so the brand holds its
+   own against the headline (client feedback, Sep 2026); once the bar
+   contracts into the pill it returns to its original size, so the pill keeps
+   its proportions. The height transitions with the
    bar so the change reads as part of the same collapse. */
 .nav__brand img {
   /* Heights are rounded to an even number of whole pixels, so the logo,
      centred in the bar, lands on whole pixels and its edges stay crisp
      (the fallback line serves browsers without round()). */
-  height: calc(var(--spacing) * 30);
-  height: round(calc(var(--spacing) * 30), 2px);
+  height: calc(var(--spacing) * 40);
+  height: round(calc(var(--spacing) * 40), 2px);
   width: auto;
   /* Optical centring: the mark sits above the word, so centring the image
      leaves the word low against the links. Lifting it about a tenth of its
@@ -312,8 +313,8 @@
   }
   .nav__menu { display: none; }
   .nav__brand img {
-    height: calc(var(--spacing) * 33);
-    height: round(calc(var(--spacing) * 33), 2px);
+    height: calc(var(--spacing) * 56);
+    height: round(calc(var(--spacing) * 56), 2px);
   }
 
   .nav.is-scrolled .nav__brand img {

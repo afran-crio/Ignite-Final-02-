@@ -18,6 +18,15 @@ subject squeezed out. Supply **3:4 portrait, or square at a push.**
 | Format | JPEG, sRGB |
 | Filenames | `01-cross-border.jpg` … `07-automotive.jpg`, exactly as below |
 
+**Lighter copies.** Each JPEG has an `.avif` and a `.webp` beside it with the
+same name, which most browsers load instead (about half the weight). **When a
+JPEG is replaced, regenerate both**, or the old picture keeps showing. From
+this folder:
+
+```
+python3 -c "from PIL import Image; import sys; [ (lambda im,b: (im.save(b+'.avif',quality=60,speed=4), im.save(b+'.webp',quality=80,method=6)))(Image.open(f).convert('RGB'), f[:-4]) for f in sys.argv[1:] ]" 01-cross-border.jpg
+```
+
 ## Art direction
 
 The number sits large and centred over the image, the description at the foot,

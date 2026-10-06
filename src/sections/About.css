@@ -1,18 +1,11 @@
 /* ==========================================================================
-   ABOUT — the opening statement
+   ABOUT — the opening statement, with its proof points
 
    Label, headline, supporting copy: the shared section pattern (see the
-   alignment rule in tokens.css). The two paragraphs share the support
-   measure and sit a paragraph's space apart.
+   alignment rule in tokens.css). On desktop the copy takes the first five
+   columns and the figures (components/ui/stats-bold) the last six, both
+   hung from the section's top; below desktop the figures follow the copy.
    ========================================================================== */
-
-/* The wash's upward reach stops at the section's own top edge here: above
-   it is the hero photograph, and a tint over the foot of that read as a
-   haze in the corner. */
-.about.section--wash::before {
-  top: 0;
-  height: calc(var(--spacing) * 420);
-}
 
 .about__label { margin-bottom: var(--eyebrow-space); }
 
@@ -25,182 +18,25 @@
   margin-top: var(--support-space);
 }
 
-/* The first paragraph takes its gap from the wrapper; the second sits a
+/* The first paragraph takes its gap from the wrapper; any after it sit a
    paragraph's space under it. */
 .about__paragraph { margin-top: 0; }
 .about__paragraph + .about__paragraph { margin-top: 0.9em; }
 
-/* ------------------------------------------------------------ growth figure
-   Four bars stepping up from the foot of the figure, each a stronger step of
-   the accent than the last, the final one solid orange and capped by the
-   logo's two squares. The bars rise one after another when the figure is
-   revealed. Beneath each, its number and stage. */
-.about__figure {
-  margin-top: var(--title-space);
-}
+.about .stats-bold__body { margin-top: calc(var(--spacing) * 40); }
 
-.about__steps {
-  --bars: calc(var(--spacing) * 200);
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  /* One row for the bars, one for the stages, shared by all four steps, so
-     every stage sits on the same line whatever the bar above it. */
-  grid-template-rows: var(--bars) auto;
-  grid-auto-flow: column;
-  column-gap: calc(var(--spacing) * 10);
-}
-
-.about__step { display: contents; }
-
-.about__bar { align-self: end; }
-
-.about__bar {
-  --h: calc(28% + var(--i) * 22%);
-  --a: calc(0.16 + var(--i) * 0.28);
-  position: relative;
-  display: block;
-  height: var(--h);
-  border-radius: calc(var(--spacing) * 6) calc(var(--spacing) * 6) 0 0;
-  background: rgba(240, 89, 40, var(--a));
-  transform-origin: bottom;
-}
-
-.about__step:last-child .about__bar { background: var(--c-orange); }
-
-.reveal .about__bar { transform: scaleY(0); }
-
-.reveal.is-visible .about__bar {
-  transform: none;
-  transition: transform 700ms var(--ease-out);
-  transition-delay: calc(150ms + var(--i) * 110ms);
-}
-
-/* The logo's mark, as drawn in public/brand/ignite-logo.png: the orange
-   square lower-left and behind, the amber square upper-right and in front,
-   overlapping it by a third. The amber is the logo's own (#fe9826), not the
-   lighter palette amber. Sat on the corner of the last bar. */
-.about__mark {
-  position: absolute;
-  right: 0;
-  bottom: calc(100% + var(--spacing) * 10);
-  width: calc(var(--spacing) * 34);
-  height: calc(var(--spacing) * 34);
-  opacity: 0;
-  transform: translateY(calc(var(--spacing) * 8));
-}
-
-.reveal.is-visible .about__mark {
-  opacity: 1;
-  transform: none;
-  transition: opacity 500ms var(--ease-out), transform 700ms var(--ease-out);
-  transition-delay: 700ms;
-}
-
-.about__mark-back,
-.about__mark-front {
-  position: absolute;
-  width: 60%;
-  height: 60%;
-  border-radius: calc(var(--spacing) * 2);
-}
-
-.about__mark-back { bottom: 0; left: 0; background: var(--c-orange); }
-.about__mark-front { top: 0; right: 0; background: #fe9826; }
-
-.about__stage {
-  display: flex;
-  flex-direction: column;
-  gap: calc(var(--spacing) * 4);
-  min-height: calc(var(--spacing) * 48);
-  padding-top: calc(var(--spacing) * 12);
-  font-size: var(--fs-small);
-  font-weight: var(--fw-medium);
-  line-height: 1.3;
-  color: var(--c-ink-soft);
-}
-
-.about__step:last-child .about__stage { color: var(--c-ink); }
-
-.about__stage-number { color: var(--c-mute); }
-.about__step:last-child .about__stage-number { color: var(--c-orange); }
-
-/* ---------------------------------------------------------- the rise
-   Once the bars are up, a soft band of light travels up through each one,
-   foot to head, in turn from Requirement to Growth, and repeats. As it
-   crests the last bar the mark lifts and settles. The light is the pseudo's
-   background moving, so nothing overflows the bar; the mark lifts with
-   `translate`, leaving `transform` to the entrance. */
-.about__bar::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: linear-gradient(
-    to top,
-    transparent 0%,
-    rgba(255, 255, 255, 0.34) 50%,
-    transparent 100%
-  ) no-repeat;
-  background-size: 100% 45%;
-  background-position: 0 200%;
-  pointer-events: none;
-}
-
-.reveal.is-visible .about__bar::before {
-  animation: about-rise 4.8s var(--ease) infinite;
-  animation-delay: calc(1100ms + var(--i) * 420ms);
-}
-
-@keyframes about-rise {
-  0% { background-position: 0 200%; }
-  36% { background-position: 0 -100%; }
-  100% { background-position: 0 -100%; }
-}
-
-.reveal.is-visible .about__mark {
-  animation: about-mark-lift 4.8s var(--ease-out) infinite;
-  animation-delay: calc(1100ms + 3 * 420ms);
-}
-
-@keyframes about-mark-lift {
-  0%, 12% { translate: 0 0; }
-  26% { translate: 0 calc(var(--spacing) * -8); }
-  44%, 100% { translate: 0 0; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .reveal .about__bar,
-  .reveal .about__mark { transform: none; opacity: 1; transition: none; }
-  .reveal.is-visible .about__bar::before,
-  .reveal.is-visible .about__mark { animation: none; }
-}
-
-/* Desktop: the text in the first seven columns, the figure in the last four,
-   its foot level with the foot of the copy. */
 @media (min-width: 1024px) {
-  .about__grid {
+  .about__layout {
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
     column-gap: var(--gutter);
-    align-items: end;
+    align-items: start;
   }
 
-  .about__text { grid-column: 1 / span 7; }
-  .about__statement { max-width: none; }
+  .about__text { grid-column: 1 / span 5; }
 
-  .about__figure {
-    grid-column: 9 / span 4;
+  .about .stats-bold__body {
+    grid-column: 7 / span 6;
     margin-top: 0;
-  }
-
-  /* Sized so the mark's top sits level with the section label. */
-  .about__steps {
-    --bars: calc(var(--spacing) * 290);
-    column-gap: calc(var(--spacing) * 12);
-  }
-
-  .about__mark {
-    width: calc(var(--spacing) * 44);
-    height: calc(var(--spacing) * 44);
   }
 }

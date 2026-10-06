@@ -35,15 +35,22 @@
 
   /* Ink — neutral, to match the white ground. The greys were previously
      warmed to sit on cream; on white that warmth read as taupe. */
-  --c-ink: #141414;
-  --c-ink-soft: #46464a;
-  --c-mute: #86868b;
+  --c-ink: #14181d;          /* a whisper of the graphite below, so ink and dark agree */
+  /* The secondary greys lean a step toward the hero photograph's steel
+     blue, so the type shares the page's cool cast without becoming a
+     colour (Oct 2026; they were neutral #46464a and #86868b). The lighter
+     is held at 4.5:1 or better on both the white and the grey band, so
+     small captions meet the WCAG AA contrast minimum. */
+  --c-ink-soft: #46525c;
+  --c-mute: #637079;
   --c-line: rgba(20, 20, 20, 0.13);
   --c-line-soft: rgba(20, 20, 20, 0.07);
 
-  /* Dark environment — hero, Our Work, footer. Neutral, like the ink: the
-     warm cast belonged to the cream ground and went with it. */
-  --c-dark: #141414;
+  /* Dark environment — hero, Our Work, footer. A deep blue-charcoal rather
+     than a neutral black: softer and more institutional, without reading as
+     navy (client feedback, Oct 2026). Near-blacks elsewhere (the hero scrim,
+     the Works tiles, the Team card reverse) are tinted to match. */
+  --c-dark: #11151a;
   --c-on-dark: #ffffff;
   --c-on-dark-soft: rgba(255, 255, 255, 0.66);
   --c-on-dark-mute: rgba(255, 255, 255, 0.38);
@@ -70,7 +77,9 @@
      The number is the px value at a 16px root. */
   --fs-hero: calc(var(--spacing) * 54);
   --fs-display: calc(var(--spacing) * 40);
-  --fs-h2: calc(var(--spacing) * 34);
+  /* Section headlines: a step down from the hero, so only the hero carries
+     display scale (client feedback, Oct 2026: calmer, more editorial). */
+  --fs-h2: calc(var(--spacing) * 28);
   --fs-h3: calc(var(--spacing) * 21);
   --fs-metric: calc(var(--spacing) * 64);
   --fs-metric-sm: calc(var(--spacing) * 34);
@@ -139,8 +148,10 @@
 
   /* -------------------------------------------------------------- elements */
   /* The reference rounds its media generously; the system is soft, not square. */
-  --radius-media: calc(var(--spacing) * 18);
-  --radius-card: calc(var(--spacing) * 14);
+  /* One corner for every card, tile and photograph frame on the page, so
+     the panels read as one system (Oct 2026; they were 14, 18 and 24). */
+  --radius-media: calc(var(--spacing) * 16);
+  --radius-card: calc(var(--spacing) * 16);
   --radius-pill: 999px;
 
   /* ---------------------------------------------------------------- motion */
@@ -184,16 +195,17 @@ html {
   }
 }
 
-/* Desktop — 44px margin, 20px gutter, ~94px columns at 1440px. The margin
-   was 64px; it was brought in so the logo, the hero headline and every
-   section share one tighter left line (40–48px across common desktop
-   widths). Columns = (grid − 11 gutters) / 12. */
+/* Desktop — 158px margin, 20px gutter, ~75px columns at 1440px. The page
+   is held to the width the founder's quote took (ten of the earlier twelve
+   columns, centred), so every section has that much space on either side
+   (Oct 2026; the margin was 44px). Full-bleed grounds and the rails still
+   run edge to edge. Columns = (grid − 11 gutters) / 12. */
 @media (min-width: 1024px) {
   html {
-    --margin: calc(3.05556vw - var(--sbw) * 0.0305556);
+    --margin: calc(10.99538vw - var(--sbw) * 0.1099538);
     --gutter: calc(1.38889vw - var(--sbw) * 0.0138889);
-    --column: calc(6.55093vw - var(--sbw) * 0.0655093);
-    --grid-width: calc(93.8889vw - var(--sbw) * 0.938889);
+    --column: calc(5.22762vw - var(--sbw) * 0.0522762);
+    --grid-width: calc(78.00924vw - var(--sbw) * 0.7800924);
 
     /* 16px at 1440, growing to a 19px ceiling on very wide screens. */
     font-size: clamp(14px, calc(1.11111vw - var(--sbw) * 0.0111111), 19px);
@@ -207,29 +219,29 @@ html {
    from the large-phone size up to where the desktop values take over. */
 @media (min-width: 768px) {
   :root {
-    --fs-hero: min(calc(var(--spacing) * 96), calc(var(--grid-width) * 0.9 / 5.3));
-    --fs-h2: calc(27px + 1.57vw);
+    /* The longer hero line, "Empowering Growth.", is ~9.4em: held to the
+       grid so it sets on one line. */
+    --fs-hero: min(calc(var(--spacing) * 80), calc(var(--grid-width) * 0.95 / 9.6));
   }
 }
 
 /* Desktop resets the vertical rhythm and type scale upward. */
 @media (min-width: 1024px) {
   :root {
-    /* The hero headline: the largest type on the page, held to a share of
-       the viewport height so four lines of it always clear the nav on
-       shorter screens. */
-    /* Also held so "Empowering" (5.28em, the longest line) fills no more
-       than ~58% of the grid — the hero's right-hand column needs the rest. */
-    --fs-hero: min(calc(var(--spacing) * 136), 21svh, calc(var(--grid-width) * 0.58 / 5.3));
+    /* The hero headline, two lines: the largest type on the page, but set
+       a step down (it was 136) so the brand carries more of the frame
+       (client feedback, Sep 2026). Held so "Empowering Growth." (~9.4em,
+       the longer line) fills no more than ~70% of the grid. */
+    --fs-hero: min(calc(var(--spacing) * 84), calc(var(--grid-width) * 0.7 / 9.6));
     --fs-display: calc(var(--spacing) * 78);
     /* The one section-headline size. Every major section headline (all but
-       the hero and the closing statement) takes it. It is the size at which
-       the Approach headline's longer line — 21.2em in Figtree Medium — fills
-       ~95% of the grid, capped at 58px at a 16px root, so it also holds on
-       narrower desktops where the root stops scaling but the grid does not. */
-    --fs-h2: min(calc(var(--grid-width) * 0.95 / 21.2), calc(var(--spacing) * 58));
-    --fs-h3: calc(var(--spacing) * 26);
-    --fs-metric: calc(var(--spacing) * 150);
+       the hero and the closing statement) takes it. Set well under the hero
+       (it was up to 58) so that past the hero the page settles into an
+       editorial rhythm rather than treating each section as a hero
+       (client feedback, Oct 2026). */
+    --fs-h2: calc(var(--spacing) * 40);
+    --fs-h3: calc(var(--spacing) * 22);
+    --fs-metric: calc(var(--spacing) * 96);
     --fs-metric-sm: calc(var(--spacing) * 52);
     --fs-lead: calc(var(--spacing) * 19);
     --fs-body: calc(var(--spacing) * 16.5);
@@ -239,9 +251,9 @@ html {
     --nav-height: calc(var(--spacing) * 92);
     --section-space: calc(var(--spacing) * 96);
     --section-space-tight: calc(var(--spacing) * 56);
-    --fs-support: calc(var(--spacing) * 22);
+    --fs-support: calc(var(--spacing) * 18);
     --block-space: calc(var(--spacing) * 24);
-    --title-space: calc(var(--spacing) * 56);
+    --title-space: calc(var(--spacing) * 44);
     --eyebrow-space: calc(var(--spacing) * 20);
     --support-space: calc(var(--spacing) * 24);
     --card-pad: calc(var(--spacing) * 32);
@@ -249,7 +261,6 @@ html {
     /* Headlines take ten of the twelve columns; supporting copy seven. */
     --measure-heading: calc(var(--column) * 10 + var(--gutter) * 9);
     --measure-support: calc(var(--column) * 7 + var(--gutter) * 6);
-    --radius-media: calc(var(--spacing) * 24);
   }
 }
 

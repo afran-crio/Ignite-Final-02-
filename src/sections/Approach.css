@@ -10,13 +10,6 @@
    Two by two on phones, four across from tablet up.
    ========================================================================== */
 
-.approach {
-  --wash-x: 24%;
-  --wash-w: 60%;
-  --wash-h: 34%;
-  --wash-a: 0.08;
-}
-
 .approach__eyebrow { margin-bottom: var(--eyebrow-space); }
 
 .approach__lead {
@@ -56,7 +49,7 @@
 .approach__number {
   align-self: flex-start;
   padding-bottom: calc(var(--spacing) * 14);
-  font-size: calc(var(--spacing) * 64);
+  font-size: calc(var(--spacing) * 44);
   font-weight: var(--fw-medium);
   line-height: 0.8;
   letter-spacing: var(--ls-display);
@@ -154,10 +147,7 @@
     white-space: nowrap;
   }
 
-  .approach__number {
-    padding-bottom: calc(var(--spacing) * 20);
-    font-size: calc(var(--spacing) * 120);
-  }
+  .approach__number { padding-bottom: calc(var(--spacing) * 20); }
 
   .approach__title { padding-top: calc(var(--spacing) * 20); }
 }

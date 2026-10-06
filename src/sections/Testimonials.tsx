@@ -3,91 +3,38 @@ import { testimonials } from '../content/content';
 import Reveal from '../components/Reveal';
 import './Testimonials.css';
 
-/** How long each quote holds before the next one takes over (when the
-    page scroll is not driving the quotes). */
-const INTERVAL = 8000;
-
-/* The page scroll moves through the quotes on every device; only where the
-   reader has asked for reduced motion do they switch by timer and swipe. */
-const PINNED = '(prefers-reduced-motion: no-preference)';
-
-/** How much page scroll each quote holds for, as a share of the screen. */
-const STEP = 0.7;
+/** How long each quote holds before the next one takes over (it was 8s;
+    brought to 5s, then 4s, Oct 2026). */
+const INTERVAL = 4000;
 
 /**
- * One quote at a time on the white ground, set large, over a large faint
- * orange quotation mark. The progress bars beneath switch
- * between the quotes; the current one fills as the timer.
- *
- * The page scroll moves through them: the section holds in place while the
- * reader scrolls, one quote after another, then the page carries on — so
- * every visitor reads all three. Each quote arrives word by word, rising
- * into place, and closes with a large faint orange quotation mark. The bars
- * show where the reader is, filling with the scroll, and take them to a
- * quote; a sideways swipe, drag or trackpad scroll moves to the next or
- * previous one. Under reduced motion the section does not hold: the quote
- * advances on a timer instead (pausing under the pointer). The quotes share one
- * grid cell and cross-fade, so the block keeps the height of the longest
- * and never jumps the page. Under reduced motion nothing advances by itself.
+ * The client quotes, set inside the Marquee Clientele section beneath the
+ * logos (client feedback, Sep 2026) rather than as a section of their own —
+ * the clients, then what they say. One quote at a time, set large, opened
+ * by an orange quotation mark. The quotes rotate by themselves on a timer while
+ * the section is in view — passive, never tied to the page scroll (client
+ * feedback, Sep 2026) — pausing under the pointer or keyboard focus. Each
+ * quote arrives word by word, rising into place. The bars beneath show where the rotation is,
+ * the current one filling as the timer, and take the reader to a quote; a
+ * sideways swipe, drag or trackpad scroll moves to the next or previous one.
+ * The quotes share one grid cell and cross-fade, so the block keeps the
+ * height of the longest and never jumps the page. Under reduced motion
+ * nothing advances by itself.
  *
  * Quotation marks are added by the layout, never stored in the copy.
  */
 export default function Testimonials() {
   const { items } = testimonials;
   const [active, setActive] = useState(0);
-  const [held, setHeld] = useState(false);
+  /* The rotation holds while a mouse is over the quotes, while a control in
+     them has keyboard focus, or while a finger presses and holds them on a
+     phone (Oct 2026). Kept apart, so one ending doesn't release the others. */
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const [pressed, setPressed] = useState(false);
+  const held = hovered || focused || pressed;
   const [inView, setInView] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
-  const sectionRef = useRef<HTMLElement>(null);
-  const barsRef = useRef<HTMLDivElement>(null);
-  const [pinned, setPinned] = useState(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia(PINNED);
-    const update = () => setPinned(mq.matches);
-    update();
-    mq.addEventListener('change', update);
-    return () => mq.removeEventListener('change', update);
-  }, []);
-
-  /* Pinned: where the page scroll is in the held section picks the quote,
-     and fills the current bar with the progress through it. */
-  useEffect(() => {
-    const section = sectionRef.current;
-    if (!section || !pinned) return;
-    let frame = 0;
-    const onScroll = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        const r = section.getBoundingClientRect();
-        const run = r.height - window.innerHeight;
-        const p = run > 0 ? Math.min(1, Math.max(0, -r.top / run)) : 0;
-        const at = Math.min(items.length - 1, Math.floor(p * items.length));
-        setActive(at);
-        barsRef.current?.style.setProperty(
-          '--fill',
-          String(Math.min(1, Math.max(0, p * items.length - at))),
-        );
-      });
-    };
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
-    };
-  }, [pinned, items.length]);
-
-  /* Pinned: scroll the page to the start of quote i's stretch. */
-  const showPinned = (i: number) => {
-    const section = sectionRef.current;
-    if (!section) return;
-    const run = section.offsetHeight - window.innerHeight;
-    const top = section.getBoundingClientRect().top + window.scrollY;
-    window.scrollTo({ top: top + ((i + 0.02) / items.length) * run, behavior: 'smooth' });
-  };
 
   useEffect(() => {
     const node = rootRef.current;
@@ -100,31 +47,27 @@ export default function Testimonials() {
   }, []);
 
   useEffect(() => {
-    if (pinned || held || !inView) return;
+    if (held || !inView) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const timer = window.setTimeout(() => setActive((i) => (i + 1) % items.length), INTERVAL);
     return () => window.clearTimeout(timer);
-  }, [active, held, inView, items.length, pinned]);
+  }, [active, held, inView, items.length]);
 
   /* Scroll between quotes: a sideways swipe or drag, or a sideways
      trackpad scroll, moves to the next or previous one. Up-and-down
      scrolling is left to the page. */
-  const go = (step: number) => {
-    if (pinned) {
-      showPinned(Math.min(items.length - 1, Math.max(0, active + step)));
-      return;
-    }
-    setActive((i) => (i + step + items.length) % items.length);
-  };
+  const go = (step: number) => setActive((i) => (i + step + items.length) % items.length);
   const drag = useRef<{ x: number; y: number } | null>(null);
   const wheelLock = useRef(0);
 
   const onPointerDown = (e: React.PointerEvent) => {
     drag.current = { x: e.clientX, y: e.clientY };
+    if (e.pointerType !== 'mouse') setPressed(true);
   };
   const onPointerUp = (e: React.PointerEvent) => {
     const start = drag.current;
     drag.current = null;
+    setPressed(false);
     if (!start) return;
     const dx = e.clientX - start.x;
     const dy = e.clientY - start.y;
@@ -140,37 +83,33 @@ export default function Testimonials() {
   };
 
   return (
-    <section
-      className={`section section--quiet testimonials${pinned ? ' is-pinned' : ''}`}
-      id="testimonials"
-      ref={sectionRef}
-      style={{ '--quotes': items.length, '--step': STEP } as React.CSSProperties}
-    >
-      <div className="wrap">
-        <Reveal as="p" className="label testimonials__eyebrow">
-          {testimonials.heading}
-        </Reveal>
-
-        <Reveal delay={80}>
+    <div className="testimonials" id="testimonials">
+      <Reveal delay={80}>
           <div
             className={`testimonials__body${held ? ' is-held' : ''}`}
+            role="region"
+            aria-label={testimonials.heading}
             ref={rootRef}
             style={{ '--interval': `${INTERVAL}ms` } as React.CSSProperties}
-            onMouseEnter={() => setHeld(true)}
-            onMouseLeave={() => setHeld(false)}
-            onFocusCapture={() => setHeld(true)}
-            onBlurCapture={() => setHeld(false)}
+            /* Pointer events, not mouse events: a tap on a phone also fires
+               mouseenter, which would hold the rotation after the finger
+               lifts. Focus holds only when it's from the keyboard. */
+            onPointerEnter={(e) => e.pointerType === 'mouse' && setHovered(true)}
+            onPointerLeave={(e) => e.pointerType === 'mouse' && setHovered(false)}
+            onFocusCapture={(e) => setFocused(e.target.matches(':focus-visible'))}
+            onBlurCapture={() => setFocused(false)}
           >
-            <span className="testimonials__mark" aria-hidden="true">
-              &ldquo;
-            </span>
-
             <div
               className="testimonials__slides"
               aria-live="polite"
               onPointerDown={onPointerDown}
               onPointerUp={onPointerUp}
-              onPointerCancel={() => (drag.current = null)}
+              onPointerCancel={() => {
+                /* The page took the gesture over to scroll: not a hold. */
+                drag.current = null;
+                setPressed(false);
+              }}
+              onContextMenu={(e) => pressed && e.preventDefault()}
               onWheel={onWheel}
             >
               {items.map((item, i) => (
@@ -192,9 +131,6 @@ export default function Testimonials() {
                         {word}{' '}
                       </span>
                     ))}
-                    <span className="testimonials__close" aria-hidden="true">
-                      &rdquo;
-                    </span>
                   </blockquote>
                   <figcaption className="testimonials__attribution">
                     <p className="testimonials__name">{item.name}</p>
@@ -204,7 +140,7 @@ export default function Testimonials() {
               ))}
             </div>
 
-            <div className="testimonials__bars" ref={barsRef}>
+            <div className="testimonials__bars">
               {items.map((item, i) => (
                 <button
                   key={item.name}
@@ -212,15 +148,14 @@ export default function Testimonials() {
                   className={`testimonials__bar${i === active ? ' is-current' : ''}`}
                   aria-label={`Testimonial ${i + 1} of ${items.length}: ${item.name}`}
                   aria-current={i === active}
-                  onClick={() => (pinned ? showPinned(i) : setActive(i))}
+                  onClick={() => setActive(i)}
                 >
                   <span className="testimonials__bar-fill" />
                 </button>
               ))}
             </div>
           </div>
-        </Reveal>
-      </div>
-    </section>
+      </Reveal>
+    </div>
   );
 }
